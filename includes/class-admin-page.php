@@ -25,6 +25,7 @@ class PMPRO_Level_Explorer_Admin {
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'add_menu' ) );
 		add_filter( 'pmpro_nav_tabs', array( __CLASS__, 'add_nav_tab' ), 20 );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
 	}
 
 	/**
@@ -59,6 +60,38 @@ class PMPRO_Level_Explorer_Admin {
 	}
 
 	/**
+	 * Enqueue admin assets.
+	 *
+	 * @since 1.0.0
+	 * @param string $hook Current admin page hook.
+	 */
+	public static function enqueue_assets( $hook ) {
+		// Only load on our plugin page.
+		if ( isset( $_GET['page'] ) && 'pmpro-level-explorer' === $_GET['page'] ) {
+			// Apply filters for customization.
+			$default_order = apply_filters( 'pmpro_level_explorer_default_order', array( 0, 'desc' ) );
+			$page_length   = apply_filters( 'pmpro_level_explorer_page_length', 25 );
+			$length_menu   = apply_filters( 'pmpro_level_explorer_length_menu', array( 25, 50, 100, 500 ) );
+
+			wp_enqueue_style( 'pmpro-admin', plugins_url( 'paid-memberships-pro/css/admin.css' ), array(), PMPRO_VERSION );
+			wp_enqueue_style( 'datatables', PMPRO_LEVEL_EXPLORER_URL . 'assets/css/datatables/dataTables.dataTables.min.css', array(), PMPRO_LEVEL_EXPLORER_VERSION );
+			wp_enqueue_style( 'pmpro-level-explorer', PMPRO_LEVEL_EXPLORER_URL . 'assets/css/admin.css', array(), PMPRO_LEVEL_EXPLORER_VERSION );
+			wp_enqueue_script( 'datatables', PMPRO_LEVEL_EXPLORER_URL . 'assets/js/datatables/dataTables.min.js', array( 'jquery' ), PMPRO_LEVEL_EXPLORER_VERSION, true );
+			wp_enqueue_script( 'pmpro-level-explorer', PMPRO_LEVEL_EXPLORER_URL . 'assets/js/admin.js', array( 'jquery', 'datatables' ), PMPRO_LEVEL_EXPLORER_VERSION, true );
+			wp_localize_script(
+				'pmpro-level-explorer',
+				'pmproLevelExplorer',
+				array(
+					'levels'       => self::get_levels_data(),
+					'defaultOrder' => $default_order,
+					'pageLength'   => $page_length,
+					'lengthMenu'   => $length_menu,
+				)
+			);
+		}
+	}
+
+	/**
 	 * Render the Level Explorer admin page.
 	 *
 	 * @since 1.0.0
@@ -68,20 +101,11 @@ class PMPRO_Level_Explorer_Admin {
 		if ( ! current_user_can( 'pmpro_membershiplevels' ) ) {
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'pmpro-level-explorer' ) );
 		}
-
-		$levels_data = self::get_levels_data();
-
-		wp_enqueue_style( 'pmpro-admin', plugins_url( 'paid-memberships-pro/css/admin.css' ), array(), PMPRO_VERSION );
-		wp_enqueue_style( 'datatables', PMPRO_LEVEL_EXPLORER_URL . 'assets/css/datatables/dataTables.dataTables.min.css', array(), PMPRO_LEVEL_EXPLORER_VERSION );
-		wp_enqueue_style( 'pmpro-level-explorer', PMPRO_LEVEL_EXPLORER_URL . 'assets/css/admin.css', array(), PMPRO_LEVEL_EXPLORER_VERSION );
-		wp_enqueue_script( 'datatables', PMPRO_LEVEL_EXPLORER_URL . 'assets/js/datatables/dataTables.min.js', array( 'jquery' ), PMPRO_LEVEL_EXPLORER_VERSION, true );
-		wp_enqueue_script( 'pmpro-level-explorer', PMPRO_LEVEL_EXPLORER_URL . 'assets/js/admin.js', array( 'jquery', 'datatables' ), PMPRO_LEVEL_EXPLORER_VERSION, true );
-		wp_localize_script( 'pmpro-level-explorer', 'pmproLevelExplorer', array( 'levels' => $levels_data ) );
 		?>
 
 		<div class="wrap pmpro_admin">
 			<h1 class="wp-heading-inline"><?php esc_html_e( 'Level Explorer', 'pmpro-level-explorer' ); ?></h1>
-			<a class="page-title-action pmpro-has-icon pmpro-has-icon-plus" href="<?php echo esc_url( admin_url( 'admin.php?page=pmpro-membershiplevels&edit=-1' ) ); ?>"><?php esc_html_e( 'Add New Level', 'pmpro-level-explorer' ); ?></a>
+			<a class="page-title-action pmpro-has-icon pmpro-has-icon-plus" href="<?php echo esc_url( admin_url( 'admin.php?page=pmpro-membershiplevels&edit=-1&template=none' ) ); ?>"><?php esc_html_e( 'Add New Advanced Level', 'pmpro-level-explorer' ); ?></a>
 			<a class="page-title-action pmpro-has-icon pmpro-has-icon-plus" href="<?php echo esc_url( admin_url( 'admin.php?page=pmpro-membershiplevels&edit_group=-1' ) ); ?>"><?php esc_html_e( 'Add New Group', 'pmpro-level-explorer' ); ?></a>
 			<hr class="wp-header-end">
 
@@ -123,7 +147,7 @@ class PMPRO_Level_Explorer_Admin {
 		global $wpdb;
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$levels = $wpdb->get_results( "SELECT * FROM {$wpdb->pmpro_membership_levels} ORDER BY name ASC" );
+		$levels = $wpdb->get_results( "SELECT * FROM {$wpdb->pmpro_membership_levels} ORDER BY id DESC" );
 
 		// Get active member counts.
 		$member_counts = array();

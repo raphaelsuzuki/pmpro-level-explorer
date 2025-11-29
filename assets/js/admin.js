@@ -7,6 +7,10 @@
 
 jQuery( document ).ready( function( $ ) {
 	var levelsData = pmproLevelExplorer.levels;
+	var defaultOrder = pmproLevelExplorer.defaultOrder || [ 0, 'desc' ];
+	var pageLength = pmproLevelExplorer.pageLength || 25;
+	var lengthMenu = pmproLevelExplorer.lengthMenu || [ 25, 50, 100, 500 ];
+
 	var table = new DataTable( '#levels-table', {
 		data: levelsData,
 		columns: [
@@ -25,16 +29,16 @@ jQuery( document ).ready( function( $ ) {
 			{ data: 'signups' },
 			{ data: 'actions', orderable: false }
 		],
-		pageLength: 25,
-		lengthMenu: [ [ 25, 50, 100, 500 ], [ 25, 50, 100, 500 ] ],
-		order: [ [ 1, 'asc' ] ],
+		pageLength: pageLength,
+		lengthMenu: [ lengthMenu, lengthMenu ],
+		order: [ defaultOrder ],
 		initComplete: function() {
 			var api = this.api();
 			var filters = $( '#table-filters' );
 
 			$( '.dt-search input' ).attr( 'placeholder', 'Search...' );
 
-			// Add filter dropdowns for Group, Cycle, Expiration, Trial Enabled, New Signups.
+			// Add filter dropdowns for Group, Cycle, Trial Enabled, Expiration, New Signups.
 			api.columns( [ 2, 6, 8, 11, 12 ] ).every( function() {
 				var column = this;
 				var title = $( column.header() ).text();

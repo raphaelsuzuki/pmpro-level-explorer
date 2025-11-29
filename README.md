@@ -116,6 +116,39 @@ Choose to display 25, 50, 100, or 500 levels per page.
 - ✅ PMPro Groups
 - ✅ Multisite compatible
 
+## Developer Hooks
+
+### Customize Default Sorting
+
+Change the default sort column and direction:
+
+```php
+add_filter( 'pmpro_level_explorer_default_order', function( $order ) {
+    return array( 1, 'asc' ); // Sort by Name (column 1) ascending
+    // Column indices: 0=ID, 1=Name, 2=Group, 3=Members, etc.
+} );
+```
+
+### Customize Page Length
+
+Change the default number of levels per page:
+
+```php
+add_filter( 'pmpro_level_explorer_page_length', function( $length ) {
+    return 50; // Show 50 levels per page
+} );
+```
+
+### Customize Length Menu
+
+Change the available page length options:
+
+```php
+add_filter( 'pmpro_level_explorer_length_menu', function( $menu ) {
+    return array( 10, 25, 50, 100 ); // Custom options
+} );
+```
+
 ## Frequently Asked Questions
 
 ### Does this replace PMPro's levels page?
@@ -136,17 +169,37 @@ No, it only reads from PMPro's existing tables.
 
 ## Changelog
 
+### 1.1.0
+- Enhanced: Improved WordPress Coding Standards compliance
+- Enhanced: Added robust dependency checking with `function_exists()`
+- Enhanced: Moved asset enqueuing to `admin_enqueue_scripts` hook
+- Enhanced: Added text domain loading for translations
+- Enhanced: Guarded constant definitions for better compatibility
+- Added: Developer hooks for customization:
+  - `pmpro_level_explorer_default_order` - Customize default sort column/direction
+  - `pmpro_level_explorer_page_length` - Customize default page length
+  - `pmpro_level_explorer_length_menu` - Customize pagination options
+- Changed: Default sort to ID descending (newest levels first)
+- Changed: "Add New Level" button now links to advanced level template
+- Fixed: Proper capability checks in render method
+- Fixed: PHPCS compliance with proper database query annotations
+
 ### 1.0.0
 - Initial release
-- DataTables 2.3.5 integration
-- Advanced filtering (Group, Cycle, Trial, Expiration, Signups)
-- Live search functionality
-- Active member counts
-- PMPro Groups support
-- Edit, Copy, Delete actions
-- PMPro design system styling
+- DataTables 2.3.5 integration (locally hosted)
+- Advanced filtering (Group, Cycle, Trial Enabled, Expiration, New Signups)
+- Live search functionality with 300px search input
+- Active member counts per level
+- PMPro Groups support with proper JOIN queries
+- Quick actions: Edit, Copy, Delete with confirmation
+- PMPro design system styling (CSS variables)
 - WordPress Coding Standards compliant
 - Full phpDoc documentation
+- Git Updater support for automatic updates
+
+## Contributing
+
+Contributions are welcome! Please submit pull requests or open issues on GitHub.
 
 ## Support
 
