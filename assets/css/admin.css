@@ -1,0 +1,78 @@
+/**
+ * PMPro Level Explorer Admin Styles
+ *
+ * @package PMPro_Level_Explorer
+ * @since 1.0.0
+ */
+
+.pmpro_admin .wp-heading-inline {
+	margin-top: 0;
+}
+
+#explorer-wrapper {
+	background-color: #FFF;
+	border: 1px solid var(--pmpro--border--color);
+	border-radius: var(--pmpro--border--radius);
+	box-shadow: var(--pmpro--box-shadow);
+	padding: 20px;
+	margin: 20px 0;
+}
+
+#table-filters {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+.dt-layout-row {
+	display: flex;
+}
+
+.dt-layout-start,
+.dt-layout-end {
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+}
+
+.dt-layout-start {
+	order: 2;
+	margin-left: auto !important;
+}
+
+.dt-layout-end {
+	order: 1;
+}
+
+div.dt-container .dt-length select.dt-input {
+	padding-right: 24px !important;
+}
+
+.dt-search label {
+	display: none;
+}
+
+.dt-search input.dt-input {
+	width: 300px;
+}
+
+#levels-table thead th {
+	text-align: left !important;
+}
+
+#levels-table thead th div.dt-column-header {
+	justify-content: space-between !important;
+	flex-direction: row !important;
+}
+
+#levels-table thead th span.dt-column-order {
+	margin-left: auto !important;
+}
+
+#levels-table .delete-link {
+	color: #d63638;
+}
+
+#levels-table .delete-link:hover {
+	color: #d63638;
+}
