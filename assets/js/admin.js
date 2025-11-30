@@ -17,7 +17,7 @@ jQuery( document ).ready( function( $ ) {
 			{ data: 'id' },
 			{ data: 'name' },
 			{ data: 'group' },
-			{ data: 'group_id' },
+			{ data: 'group_id', defaultContent: '' },
 			{ data: 'members' },
 			{ data: 'initial' },
 			{ data: 'billing' },

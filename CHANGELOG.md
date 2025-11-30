@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-11-30
+
+### Added
+- Group ID column to levels table (displayed after Group column)
+- `pmpro_section_inside` class to DataTables wrapper for better styling integration
+- `pmpro_section_actions` class to pagination row for consistent layout
+- Separate CHANGELOG.md file following Keep a Changelog format
+
+### Changed
+- Default sorting changed to Group ID ascending (from ID descending)
+- README.md now references CHANGELOG.md for version history
+- Merged Description section into main paragraph in README
+
+### Fixed
+- Added `defaultContent` fallback for group_id column to prevent JavaScript errors when data is missing
+
 ## [1.1.0] - 2025-11-30
 
 ### Added
@@ -43,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full phpDoc documentation
 - Git Updater support for automatic updates
 
-[unreleased]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.1.0...HEAD
+[unreleased]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/releases/tag/v1.0.0
