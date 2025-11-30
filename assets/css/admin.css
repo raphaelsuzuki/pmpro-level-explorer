@@ -9,20 +9,9 @@
 	margin-top: 0;
 }
 
-#explorer-wrapper {
-	background-color: #FFF;
-	border: 1px solid var(--pmpro--border--color);
-	border-radius: var(--pmpro--border--radius);
-	box-shadow: var(--pmpro--box-shadow);
-	padding: 20px;
-	margin: 20px 0;
-}
-
 #table-filters {
 	display: flex;
 	gap: 10px;
-	align-items: center;
-	margin-bottom: 20px;
 }
 
 .dt-layout-row {
@@ -75,4 +64,8 @@ div.dt-container .dt-length select.dt-input {
 
 #levels-table .delete-link:hover {
 	color: #d63638;
+}
+
+#levels-table_wrapper .pmpro_section_actions {
+	padding-right: 20px;
 }

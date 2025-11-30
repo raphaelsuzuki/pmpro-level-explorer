@@ -1,10 +1,6 @@
 # PMPro Level Explorer
 
-Enhanced level management for Paid Memberships Pro with advanced filtering, sorting, and search powered by DataTables.
-
-## Description
-
-PMPro Level Explorer adds a powerful admin interface to manage membership levels efficiently, perfect for sites with many levels.
+Enhanced level management for Paid Memberships Pro with advanced filtering, sorting, and search powered by DataTables. PMPro Level Explorer adds a powerful admin interface to manage membership levels efficiently, perfect for sites with many levels.
 
 ## Features
 
@@ -89,32 +85,6 @@ Choose to display 25, 50, 100, or 500 levels per page.
 - **Copy** - Creates a copy of the level
 - **Delete** - Deletes the level (with confirmation)
 
-## Technical Details
-
-### WordPress Coding Standards
-
-- Fully compliant with WordPress Coding Standards
-- phpDoc documentation for all functions and methods
-- Proper escaping and sanitization
-- Translatable strings with text domain
-
-### Database Queries
-
-- Queries PMPro's native tables
-- Supports PMPro Groups via JOIN queries
-- Efficient member count aggregation
-
-### Assets
-
-- DataTables 2.3.5 (locally hosted)
-- Custom CSS using PMPro design system variables
-- Minimal JavaScript for filter initialization
-
-## Compatibility
-
-- ✅ Standard PMPro levels
-- ✅ PMPro Groups
-- ✅ Multisite compatible
 
 ## Developer Hooks
 
@@ -169,49 +139,16 @@ No, it only reads from PMPro's existing tables.
 
 ## Changelog
 
-### 1.1.0
-- Enhanced: Improved WordPress Coding Standards compliance
-- Enhanced: Added robust dependency checking with `function_exists()`
-- Enhanced: Moved asset enqueuing to `admin_enqueue_scripts` hook
-- Enhanced: Added text domain loading for translations
-- Enhanced: Guarded constant definitions for better compatibility
-- Added: Developer hooks for customization:
-  - `pmpro_level_explorer_default_order` - Customize default sort column/direction
-  - `pmpro_level_explorer_page_length` - Customize default page length
-  - `pmpro_level_explorer_length_menu` - Customize pagination options
-- Changed: Default sort to ID descending (newest levels first)
-- Changed: "Add New Level" button now links to advanced level template
-- Fixed: Proper capability checks in render method
-- Fixed: PHPCS compliance with proper database query annotations
-
-### 1.0.0
-- Initial release
-- DataTables 2.3.5 integration (locally hosted)
-- Advanced filtering (Group, Cycle, Trial Enabled, Expiration, New Signups)
-- Live search functionality with 300px search input
-- Active member counts per level
-- PMPro Groups support with proper JOIN queries
-- Quick actions: Edit, Copy, Delete with confirmation
-- PMPro design system styling (CSS variables)
-- WordPress Coding Standards compliant
-- Full phpDoc documentation
-- Git Updater support for automatic updates
+See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## Contributing
 
 Contributions are welcome! Please submit pull requests or open issues on GitHub.
 
-## Support
-
-For issues and feature requests, please use the GitHub repository:
-https://github.com/raphaelsuzuki/pmpro-level-explorer
-
 ## License
 
 GPL v2 or later - https://www.gnu.org/licenses/gpl-2.0.html
 
-## Credits
+## Disclaimer
 
-- Built for Paid Memberships Pro
-- Powered by DataTables 2.3.5
-- Developed by Raphael Suzuki
+This repository and its documentation were created with the assistance of AI. While efforts have been made to ensure accuracy and completeness, no guarantee is provided. Use at your own risk. Always test in a safe environment before deploying to production.

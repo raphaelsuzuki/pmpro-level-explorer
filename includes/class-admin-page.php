@@ -69,7 +69,7 @@ class PMPRO_Level_Explorer_Admin {
 		// Only load on our plugin page.
 		if ( isset( $_GET['page'] ) && 'pmpro-level-explorer' === $_GET['page'] ) {
 			// Apply filters for customization.
-			$default_order = apply_filters( 'pmpro_level_explorer_default_order', array( 0, 'desc' ) );
+			$default_order = apply_filters( 'pmpro_level_explorer_default_order', array( 3, 'asc' ) );
 			$page_length   = apply_filters( 'pmpro_level_explorer_page_length', 25 );
 			$length_menu   = apply_filters( 'pmpro_level_explorer_length_menu', array( 25, 50, 100, 500 ) );
 
@@ -109,8 +109,8 @@ class PMPRO_Level_Explorer_Admin {
 			<a class="page-title-action pmpro-has-icon pmpro-has-icon-plus" href="<?php echo esc_url( admin_url( 'admin.php?page=pmpro-membershiplevels&edit_group=-1' ) ); ?>"><?php esc_html_e( 'Add New Group', 'pmpro-level-explorer' ); ?></a>
 			<hr class="wp-header-end">
 
-			<div id="explorer-wrapper">
-				<div id="table-filters"></div>
+			<div id="explorer-wrapper" class="pmpro_section">
+				<div id="table-filters" class="pmpro_section_inside"></div>
 
 				<table id="levels-table" class="widefat display" style="width:100%">
 					<thead>
@@ -118,13 +118,14 @@ class PMPRO_Level_Explorer_Admin {
 							<th><?php esc_html_e( 'ID', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Name', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Group', 'pmpro-level-explorer' ); ?></th>
+							<th><?php esc_html_e( 'Group ID', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Members', 'pmpro-level-explorer' ); ?></th>
-							<th><?php esc_html_e( 'Initial', 'pmpro-level-explorer' ); ?></th>
-							<th><?php esc_html_e( 'Billing', 'pmpro-level-explorer' ); ?></th>
-							<th><?php esc_html_e( 'Cycle', 'pmpro-level-explorer' ); ?></th>
+							<th><?php esc_html_e( 'Initial Payment', 'pmpro-level-explorer' ); ?></th>
+							<th><?php esc_html_e( 'Billing Amount', 'pmpro-level-explorer' ); ?></th>
+							<th><?php esc_html_e( 'Billing Cycle', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Billing Limit', 'pmpro-level-explorer' ); ?></th>
-							<th><?php esc_html_e( 'Trial Enabled', 'pmpro-level-explorer' ); ?></th>
-							<th><?php esc_html_e( 'Trial', 'pmpro-level-explorer' ); ?></th>
+							<th><?php esc_html_e( 'Custom Trial', 'pmpro-level-explorer' ); ?></th>
+							<th><?php esc_html_e( 'Trial Amount', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Trial Limit', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Expiration', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'New Signups', 'pmpro-level-explorer' ); ?></th>
@@ -164,20 +165,23 @@ class PMPRO_Level_Explorer_Admin {
 
 		// Get group mappings.
 		$level_groups = array();
+		$level_group_ids = array();
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$results = $wpdb->get_results(
-			"SELECT lg.level, GROUP_CONCAT(DISTINCT g.name ORDER BY g.name SEPARATOR ', ') as group_names
+			"SELECT lg.level, GROUP_CONCAT(DISTINCT g.name ORDER BY g.name SEPARATOR ', ') as group_names, GROUP_CONCAT(DISTINCT g.id ORDER BY g.name SEPARATOR ', ') as group_ids
 			FROM {$wpdb->prefix}pmpro_membership_levels_groups lg
 			INNER JOIN {$wpdb->prefix}pmpro_groups g ON lg.group = g.id
 			GROUP BY lg.level"
 		);
 		foreach ( $results as $row ) {
 			$level_groups[ $row->level ] = $row->group_names;
+			$level_group_ids[ $row->level ] = $row->group_ids;
 		}
 
 		$data = array();
 		foreach ( $levels as $l ) {
 			$group         = isset( $level_groups[ $l->id ] ) ? $level_groups[ $l->id ] : '';
+			$group_id      = isset( $level_group_ids[ $l->id ] ) ? $level_group_ids[ $l->id ] : '';
 			$cycle         = $l->cycle_number > 0 ? $l->cycle_number . ' ' . $l->cycle_period : '-';
 			$trial         = $l->trial_amount > 0 ? '$' . number_format( $l->trial_amount, 2 ) : '-';
 			$trial_enabled = $l->trial_amount > 0 || $l->trial_limit > 0 ? 'Enabled' : 'Disabled';
@@ -192,6 +196,7 @@ class PMPRO_Level_Explorer_Admin {
 				'id'                    => (int) $l->id,
 				'name'                  => $l->name,
 				'group'                 => $group,
+				'group_id'              => $group_id,
 				'members'               => isset( $member_counts[ $l->id ] ) ? $member_counts[ $l->id ] : 0,
 				'initial'               => $l->initial_payment > 0 ? '$' . number_format( $l->initial_payment, 2 ) : '-',
 				'billing'               => $l->billing_amount > 0 ? '$' . number_format( $l->billing_amount, 2 ) : '-',
