@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2025-12-09
+
+### Added
+- Expandable child rows showing level details (description, confirmation message, account message)
+- Protected categories and pages display in child rows with clickable edit links
+- Native DataTables control column for expanding/collapsing rows
+
+### Changed
+- Removed Categories and Pages columns from main table (moved to child rows)
+- Child row displays "No [field]" message when content is missing
+
+### Security
+- Added `wp_kses_post()` sanitization for description, confirmation, and account message fields
+
 ## [1.2.0] - 2025-11-30
 
 ### Added
@@ -59,7 +73,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full phpDoc documentation
 - Git Updater support for automatic updates
 
-[unreleased]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.2.0...HEAD
+[unreleased]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/releases/tag/v1.0.0

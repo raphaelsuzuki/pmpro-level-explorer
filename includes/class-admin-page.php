@@ -115,6 +115,7 @@ class PMPRO_Level_Explorer_Admin {
 				<table id="levels-table" class="widefat display" style="width:100%">
 					<thead>
 						<tr>
+							<th></th>
 							<th><?php esc_html_e( 'ID', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Name', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Group', 'pmpro-level-explorer' ); ?></th>
@@ -128,7 +129,7 @@ class PMPRO_Level_Explorer_Admin {
 							<th><?php esc_html_e( 'Trial Amount', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Trial Limit', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Expiration', 'pmpro-level-explorer' ); ?></th>
-							<th><?php esc_html_e( 'New Signups', 'pmpro-level-explorer' ); ?></th>
+							<th><?php esc_html_e( 'Allow Signups', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Actions', 'pmpro-level-explorer' ); ?></th>
 						</tr>
 					</thead>
@@ -178,6 +179,30 @@ class PMPRO_Level_Explorer_Admin {
 			$level_group_ids[ $row->level ] = $row->group_ids;
 		}
 
+		// Get protected categories.
+		$protected_categories = array();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$results = $wpdb->get_results(
+			"SELECT membership_id, GROUP_CONCAT(category_id ORDER BY category_id SEPARATOR ', ') as category_ids
+			FROM {$wpdb->prefix}pmpro_memberships_categories
+			GROUP BY membership_id"
+		);
+		foreach ( $results as $row ) {
+			$protected_categories[ $row->membership_id ] = $row->category_ids;
+		}
+
+		// Get protected pages.
+		$protected_pages = array();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$results = $wpdb->get_results(
+			"SELECT membership_id, GROUP_CONCAT(page_id ORDER BY page_id SEPARATOR ', ') as page_ids
+			FROM {$wpdb->prefix}pmpro_memberships_pages
+			GROUP BY membership_id"
+		);
+		foreach ( $results as $row ) {
+			$protected_pages[ $row->membership_id ] = $row->page_ids;
+		}
+
 		$data = array();
 		foreach ( $levels as $l ) {
 			$group         = isset( $level_groups[ $l->id ] ) ? $level_groups[ $l->id ] : '';
@@ -195,9 +220,14 @@ class PMPRO_Level_Explorer_Admin {
 			$data[] = array(
 				'id'                    => (int) $l->id,
 				'name'                  => $l->name,
+				'description'           => $l->description ? wp_kses_post( $l->description ) : '',
+				'confirmation'          => $l->confirmation ? wp_kses_post( $l->confirmation ) : '',
+				'account_message'       => isset( $l->account_message ) ? wp_kses_post( $l->account_message ) : '',
 				'group'                 => $group,
 				'group_id'              => $group_id,
 				'members'               => isset( $member_counts[ $l->id ] ) ? $member_counts[ $l->id ] : 0,
+				'protected_categories'  => isset( $protected_categories[ $l->id ] ) ? $protected_categories[ $l->id ] : '',
+				'protected_pages'       => isset( $protected_pages[ $l->id ] ) ? $protected_pages[ $l->id ] : '',
 				'initial'               => $l->initial_payment > 0 ? '$' . number_format( $l->initial_payment, 2 ) : '-',
 				'billing'               => $l->billing_amount > 0 ? '$' . number_format( $l->billing_amount, 2 ) : '-',
 				'cycle'                 => $cycle,
@@ -206,7 +236,7 @@ class PMPRO_Level_Explorer_Admin {
 				'trial'                 => $trial,
 				'trial_limit_display'   => $l->trial_limit > 0 ? $l->trial_limit : '-',
 				'expiration'            => $l->expiration_number > 0 ? $l->expiration_number . ' ' . $l->expiration_period : 'Never',
-				'signups'               => $l->allow_signups ? 'Enabled' : 'Disabled',
+				'signups'               => $l->allow_signups ? 'Yes' : 'No',
 				'actions'               => '<a href="' . esc_url( admin_url( 'admin.php?page=pmpro-membershiplevels&edit=' . $l->id ) ) . '">' . esc_html__( 'Edit', 'pmpro-level-explorer' ) . '</a> | ' .
 					'<a href="' . esc_url( admin_url( 'admin.php?page=pmpro-membershiplevels&edit=-1&copy=' . $l->id ) ) . '">' . esc_html__( 'Copy', 'pmpro-level-explorer' ) . '</a> | ' .
 					'<a href="javascript:pmpro_askfirst(\'' . esc_js( sprintf( __( 'Are you sure you want to delete membership level %s? All payment subscriptions for this level will be cancelled.', 'pmpro-level-explorer' ), $l->name ) ) . '\', \'' . esc_js( $delete_url ) . '\'); void(0);" class="delete-link">' . esc_html__( 'Delete', 'pmpro-level-explorer' ) . '</a>',

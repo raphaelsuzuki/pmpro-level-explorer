@@ -69,3 +69,25 @@ div.dt-container .dt-length select.dt-input {
 #levels-table_wrapper .pmpro_section_actions {
 	padding-right: 20px;
 }
+
+/* Child row content */
+.child-row-content {
+	padding: 15px 20px;
+	background: #f6f7f7;
+	border-left: 3px solid #2271b1;
+}
+
+.child-details {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.child-details td {
+	padding: 5px 10px;
+	vertical-align: top;
+}
+
+.child-details td:first-child {
+	width: 200px;
+	font-weight: 600;
+}
