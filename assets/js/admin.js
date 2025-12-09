@@ -36,7 +36,7 @@ jQuery( document ).ready( function( $ ) {
 				return '<a href="term.php?taxonomy=category&tag_ID=' + id + '&post_type=post" target="_blank">' + id + '</a>';
 			} ).join( ', ' );
 		}
-		html += '<tr><td><strong>Protected Categories:</strong></td><td>' + categories + '</td></tr>';
+		html += '<tr><td><strong>Protected Category IDs:</strong></td><td>' + categories + '</td></tr>';
 		
 		// Protected Pages
 		var pages = '<em>No protected pages</em>';
@@ -46,7 +46,17 @@ jQuery( document ).ready( function( $ ) {
 				return '<a href="post.php?post=' + id + '&action=edit" target="_blank">' + id + '</a>';
 			} ).join( ', ' );
 		}
-		html += '<tr><td><strong>Protected Pages:</strong></td><td>' + pages + '</td></tr>';
+		html += '<tr><td><strong>Protected Page IDs:</strong></td><td>' + pages + '</td></tr>';
+		
+		// Protected Posts
+		var posts = '<em>No protected posts</em>';
+		if ( d.protected_posts ) {
+			var postIds = d.protected_posts.split( ', ' );
+			posts = postIds.map( function( id ) {
+				return '<a href="post.php?post=' + id + '&action=edit" target="_blank">' + id + '</a>';
+			} ).join( ', ' );
+		}
+		html += '<tr><td><strong>Protected Post IDs:</strong></td><td>' + posts + '</td></tr>';
 		
 		html += '</table>';
 		html += '</div>';
@@ -65,8 +75,8 @@ jQuery( document ).ready( function( $ ) {
 			{ data: 'id' },
 			{ data: 'name' },
 			{ data: 'group' },
-			{ data: 'group_id', defaultContent: '' },
 			{ data: 'members' },
+			{ data: 'orders' },
 			{ data: 'initial' },
 			{ data: 'billing' },
 			{ data: 'cycle' },
@@ -75,11 +85,20 @@ jQuery( document ).ready( function( $ ) {
 			{ data: 'trial' },
 			{ data: 'trial_limit_display' },
 			{ data: 'expiration' },
-			{ data: 'signups' },
+			{
+				data: 'signups',
+				render: function ( data, type, row ) {
+					// Use signups_filter for filtering and sorting
+					if ( type === 'filter' || type === 'sort' ) {
+						return row.signups_filter;
+					}
+					return data;
+				}
+			},
 			{ data: 'actions', orderable: false }
 		],
 		pageLength: pageLength,
-		lengthMenu: [ lengthMenu, lengthMenu ],
+		lengthMenu: lengthMenu,
 		order: [ defaultOrder ],
 		initComplete: function() {
 			var api = this.api();
@@ -110,6 +129,7 @@ jQuery( document ).ready( function( $ ) {
 			// Add filter dropdowns for Group, Cycle, Trial Enabled, Expiration, Allow Signups.
 			api.columns( [ 3, 8, 10, 13, 14 ] ).every( function() {
 				var column = this;
+				var columnIndex = column.index();
 				var title = $( column.header() ).text();
 				var label = title.endsWith( 's' ) ? title : title + 's';
 				var select = $( '<select><option value="">' + label + '</option></select>' )
@@ -118,10 +138,25 @@ jQuery( document ).ready( function( $ ) {
 						column.search( $( this ).val(), { exact: true } ).draw();
 					} );
 
-				column.data().unique().sort().each( function( d ) {
-					if ( d ) {
-						select.append( '<option value="' + d + '">' + d + '</option>' );
-					}
+				// For Allow Signups column, use signups_filter field
+				var uniqueValues = {};
+				if ( columnIndex === 14 ) {
+					api.rows().data().each( function( row ) {
+						var val = row.signups_filter;
+						if ( val && ! uniqueValues[ val ] ) {
+							uniqueValues[ val ] = true;
+						}
+					} );
+				} else {
+					column.data().unique().each( function( d ) {
+						if ( d && ! uniqueValues[ d ] ) {
+							uniqueValues[ d ] = true;
+						}
+					} );
+				}
+
+				Object.keys( uniqueValues ).sort().forEach( function( val ) {
+					select.append( '<option value="' + val + '">' + val + '</option>' );
 				} );
 			} );
 

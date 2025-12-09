@@ -69,7 +69,7 @@ class PMPRO_Level_Explorer_Admin {
 		// Only load on our plugin page.
 		if ( isset( $_GET['page'] ) && 'pmpro-level-explorer' === $_GET['page'] ) {
 			// Apply filters for customization.
-			$default_order = apply_filters( 'pmpro_level_explorer_default_order', array( 3, 'asc' ) );
+			$default_order = apply_filters( 'pmpro_level_explorer_default_order', array( 1, 'desc' ) );
 			$page_length   = apply_filters( 'pmpro_level_explorer_page_length', 25 );
 			$length_menu   = apply_filters( 'pmpro_level_explorer_length_menu', array( 25, 50, 100, 500 ) );
 
@@ -119,8 +119,8 @@ class PMPRO_Level_Explorer_Admin {
 							<th><?php esc_html_e( 'ID', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Name', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Group', 'pmpro-level-explorer' ); ?></th>
-							<th><?php esc_html_e( 'Group ID', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Members', 'pmpro-level-explorer' ); ?></th>
+							<th><?php esc_html_e( 'Orders', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Initial Payment', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Billing Amount', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Billing Cycle', 'pmpro-level-explorer' ); ?></th>
@@ -164,6 +164,19 @@ class PMPRO_Level_Explorer_Admin {
 			$member_counts[ $row->membership_id ] = (int) $row->count;
 		}
 
+		// Get order counts.
+		$order_counts = array();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$results = $wpdb->get_results(
+			"SELECT membership_id, COUNT(*) as count
+			FROM {$wpdb->pmpro_membership_orders}
+			WHERE membership_id IS NOT NULL
+			GROUP BY membership_id"
+		);
+		foreach ( $results as $row ) {
+			$order_counts[ $row->membership_id ] = (int) $row->count;
+		}
+
 		// Get group mappings.
 		$level_groups = array();
 		$level_group_ids = array();
@@ -191,23 +204,44 @@ class PMPRO_Level_Explorer_Admin {
 			$protected_categories[ $row->membership_id ] = $row->category_ids;
 		}
 
-		// Get protected pages.
+		// Get protected pages and posts.
 		$protected_pages = array();
+		$protected_posts = array();
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$results = $wpdb->get_results(
-			"SELECT membership_id, GROUP_CONCAT(page_id ORDER BY page_id SEPARATOR ', ') as page_ids
-			FROM {$wpdb->prefix}pmpro_memberships_pages
-			GROUP BY membership_id"
+			"SELECT mp.membership_id, 
+					GROUP_CONCAT(CASE WHEN p.post_type = 'page' THEN mp.page_id END ORDER BY mp.page_id SEPARATOR ', ') as page_ids,
+					GROUP_CONCAT(CASE WHEN p.post_type = 'post' THEN mp.page_id END ORDER BY mp.page_id SEPARATOR ', ') as post_ids
+			FROM {$wpdb->prefix}pmpro_memberships_pages mp
+			INNER JOIN {$wpdb->posts} p ON mp.page_id = p.ID
+			GROUP BY mp.membership_id"
 		);
 		foreach ( $results as $row ) {
-			$protected_pages[ $row->membership_id ] = $row->page_ids;
+			if ( $row->page_ids ) {
+				$protected_pages[ $row->membership_id ] = $row->page_ids;
+			}
+			if ( $row->post_ids ) {
+				$protected_posts[ $row->membership_id ] = $row->post_ids;
+			}
 		}
 
 		$data = array();
 		foreach ( $levels as $l ) {
-			$group         = isset( $level_groups[ $l->id ] ) ? $level_groups[ $l->id ] : '';
-			$group_id      = isset( $level_group_ids[ $l->id ] ) ? $level_group_ids[ $l->id ] : '';
-			$cycle         = $l->cycle_number > 0 ? $l->cycle_number . ' ' . $l->cycle_period : '-';
+			// Format group with ID
+			$group = '';
+			if ( isset( $level_groups[ $l->id ] ) && isset( $level_group_ids[ $l->id ] ) ) {
+				$group_names = explode( ', ', $level_groups[ $l->id ] );
+				$group_ids   = explode( ', ', $level_group_ids[ $l->id ] );
+				$formatted_groups = array();
+				foreach ( $group_names as $index => $name ) {
+					if ( isset( $group_ids[ $index ] ) ) {
+						$formatted_groups[] = $name . ' (ID: ' . $group_ids[ $index ] . ')';
+					}
+				}
+				$group = implode( ', ', $formatted_groups );
+			}
+			
+			$cycle         = $l->cycle_number > 0 ? $l->cycle_number . ' ' . $l->cycle_period . ( $l->cycle_number > 1 ? 's' : '' ) : '-';
 			$trial         = $l->trial_amount > 0 ? '$' . number_format( $l->trial_amount, 2 ) : '-';
 			$trial_enabled = $l->trial_amount > 0 || $l->trial_limit > 0 ? 'Enabled' : 'Disabled';
 
@@ -224,10 +258,11 @@ class PMPRO_Level_Explorer_Admin {
 				'confirmation'          => $l->confirmation ? wp_kses_post( $l->confirmation ) : '',
 				'account_message'       => isset( $l->account_message ) ? wp_kses_post( $l->account_message ) : '',
 				'group'                 => $group,
-				'group_id'              => $group_id,
-				'members'               => isset( $member_counts[ $l->id ] ) ? $member_counts[ $l->id ] : 0,
+				'members'               => isset( $member_counts[ $l->id ] ) && $member_counts[ $l->id ] > 0 ? '<a href="' . esc_url( admin_url( 'admin.php?page=pmpro-memberslist&l=' . $l->id ) ) . '">' . $member_counts[ $l->id ] . '</a>' : 0,
+				'orders'                => isset( $order_counts[ $l->id ] ) && $order_counts[ $l->id ] > 0 ? '<a href="' . esc_url( admin_url( 'admin.php?page=pmpro-orders&l=' . $l->id . '&filter=within-a-level' ) ) . '">' . $order_counts[ $l->id ] . '</a>' : 0,
 				'protected_categories'  => isset( $protected_categories[ $l->id ] ) ? $protected_categories[ $l->id ] : '',
 				'protected_pages'       => isset( $protected_pages[ $l->id ] ) ? $protected_pages[ $l->id ] : '',
+				'protected_posts'       => isset( $protected_posts[ $l->id ] ) ? $protected_posts[ $l->id ] : '',
 				'initial'               => $l->initial_payment > 0 ? '$' . number_format( $l->initial_payment, 2 ) : '-',
 				'billing'               => $l->billing_amount > 0 ? '$' . number_format( $l->billing_amount, 2 ) : '-',
 				'cycle'                 => $cycle,
@@ -236,7 +271,8 @@ class PMPRO_Level_Explorer_Admin {
 				'trial'                 => $trial,
 				'trial_limit_display'   => $l->trial_limit > 0 ? $l->trial_limit : '-',
 				'expiration'            => $l->expiration_number > 0 ? $l->expiration_number . ' ' . $l->expiration_period : 'Never',
-				'signups'               => $l->allow_signups ? 'Yes' : 'No',
+				'signups'               => $l->allow_signups ? 'Yes (<a href="' . esc_url( pmpro_url( 'checkout', '?level=' . $l->id ) ) . '" target="_blank">Checkout</a>)' : 'No',
+				'signups_filter'        => $l->allow_signups ? 'Yes' : 'No',
 				'actions'               => '<a href="' . esc_url( admin_url( 'admin.php?page=pmpro-membershiplevels&edit=' . $l->id ) ) . '">' . esc_html__( 'Edit', 'pmpro-level-explorer' ) . '</a> | ' .
 					'<a href="' . esc_url( admin_url( 'admin.php?page=pmpro-membershiplevels&edit=-1&copy=' . $l->id ) ) . '">' . esc_html__( 'Copy', 'pmpro-level-explorer' ) . '</a> | ' .
 					'<a href="javascript:pmpro_askfirst(\'' . esc_js( sprintf( __( 'Are you sure you want to delete membership level %s? All payment subscriptions for this level will be cancelled.', 'pmpro-level-explorer' ), $l->name ) ) . '\', \'' . esc_js( $delete_url ) . '\'); void(0);" class="delete-link">' . esc_html__( 'Delete', 'pmpro-level-explorer' ) . '</a>',

@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.5] - 2025-12-09
+
+### Added
+- Orders column with clickable count linking to filtered orders page
+- Checkout link in Allow Signups column when signups are enabled
+- Clickable member count linking to filtered members list
+- Separated Protected Posts from Protected Pages in child rows
+- Group ID now displayed inline with group name (e.g., "Group Name (ID: 5)")
+- Plural support for billing cycle periods (e.g., "3 Months", "1 Day")
+
+### Changed
+- Removed standalone Group ID column (merged into Group column)
+- Changed default sorting back to ID descending
+- Updated child row labels to clarify IDs are displayed (e.g., "Protected Post IDs")
+- Removed Checkout link from Actions column (kept in Allow Signups)
+
+### Fixed
+- Allow Signups filter dropdown now shows clean "Yes/No" options
+- Fixed pagination lengthMenu configuration
+- Fixed filter column indices after adding Orders column
+
 ## [1.3.0] - 2025-12-09
 
 ### Added
@@ -73,7 +94,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full phpDoc documentation
 - Git Updater support for automatic updates
 
-[unreleased]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.3.0...HEAD
+[unreleased]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.3.5...HEAD
+[1.3.5]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.3.0...v1.3.5
 [1.3.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.0.0...v1.1.0
