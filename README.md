@@ -7,8 +7,11 @@ Enhanced level management for Paid Memberships Pro with advanced filtering, sort
 - **DataTables Integration** - Fast, responsive table with sorting, pagination and all level details at a glance
 - **Advanced Filtering** - Filter by Group, Cycle, Trial Enabled, Expiration, and New Signups Disabled
 - **Live Search** - Instantly search levels by name or any other information
+- **State Persistence** - Automatically remembers your sort order, page length, filters, and search across sessions
 - **Active Member Counts** - See real-time active member counts per level
-- **PMPro Groups Support** - Displays levels organized by PMPro Groups
+- **Order Counts** - View total orders per level with direct links to filtered order pages
+- **Expandable Details** - Click to expand rows and view descriptions, messages, and protected content
+- **PMPro Groups Support** - Displays levels organized by PMPro Groups with IDs
 - **Quick Actions** - Edit, Copy, and Delete levels directly from the table
 - **PMPro Design System** - Matches PMPro's admin styling as much as possible
 - **Lightweight** - Locally hosted DataTables 2.3.5, no CDN dependencies
@@ -69,7 +72,19 @@ Use the dropdown filters to narrow down levels:
 - **Expiration** - Filter by expiration period
 - **New Signups** - Filter by signup status
 
-Click **Reset Filters** to clear all filters.
+Click **Reset Filters** to clear all filters and reset the table to defaults.
+
+### State Persistence
+
+The table automatically remembers your preferences across sessions:
+
+- Current page number
+- Page length (25, 50, 100, 500)
+- Sort order and column
+- Search term
+- Filter selections
+
+Your preferences are saved in your browser and persist until you click "Reset Filters" or clear your browser data.
 
 ### Search
 

@@ -100,6 +100,8 @@ jQuery( document ).ready( function( $ ) {
 		pageLength: pageLength,
 		lengthMenu: lengthMenu,
 		order: [ defaultOrder ],
+		stateSave: true,
+		stateDuration: -1,
 		initComplete: function() {
 			var api = this.api();
 			var filters = $( '#table-filters' );
@@ -158,14 +160,29 @@ jQuery( document ).ready( function( $ ) {
 				Object.keys( uniqueValues ).sort().forEach( function( val ) {
 					select.append( '<option value="' + val + '">' + val + '</option>' );
 				} );
+
+				// Restore saved filter value from state
+				var savedSearch = column.search();
+				if ( savedSearch ) {
+					select.val( savedSearch );
+				}
 			} );
 
 			// Add reset filters button.
 			$( '<button type="button" class="button">Reset Filters</button>' )
 				.appendTo( filters )
 				.on( 'click', function() {
+					// Clear filters and search
 					$( '#table-filters select' ).val( '' );
-					api.search( '' ).columns().search( '' ).draw();
+					api.search( '' ).columns().search( '' );
+					
+					// Reset to default page length and order
+					api.page.len( pageLength );
+					api.order( defaultOrder );
+					
+					// Clear saved state and redraw
+					api.state.clear();
+					api.draw();
 				} );
 		}
 	} );

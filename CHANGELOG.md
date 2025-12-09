@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2025-12-09
+
+### Added
+- Table state persistence: automatically remembers sort order, page length, filters, and search across sessions
+- Filter dropdowns now restore previously selected values on page reload
+
+### Changed
+- Reset Filters button now clears saved state and resets table to defaults without page reload
+
 ## [1.3.5] - 2025-12-09
 
 ### Added
@@ -94,7 +103,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full phpDoc documentation
 - Git Updater support for automatic updates
 
-[unreleased]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.3.5...HEAD
+[unreleased]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.3.5...v1.4.0
 [1.3.5]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.3.0...v1.3.5
 [1.3.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.1.0...v1.2.0
