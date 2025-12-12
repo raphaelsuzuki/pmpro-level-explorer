@@ -91,3 +91,7 @@ div.dt-container .dt-length select.dt-input {
 	width: 200px;
 	font-weight: 600;
 }
+/* Add space between control icon and ID */
+#levels-table td.dt-control::before {
+	margin-right: 8px;
+}

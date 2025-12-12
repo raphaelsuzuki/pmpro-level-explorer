@@ -66,13 +66,13 @@ jQuery( document ).ready( function( $ ) {
 	var table = new DataTable( '#levels-table', {
 		data: levelsData,
 		columns: [
-			{
+			{ 
+				data: 'id',
 				className: 'dt-control',
-				orderable: false,
-				data: null,
-				defaultContent: ''
+				render: function ( data, type, row ) {
+					return data;
+				}
 			},
-			{ data: 'id' },
 			{ data: 'name' },
 			{ data: 'group' },
 			{ data: 'members' },
@@ -81,7 +81,6 @@ jQuery( document ).ready( function( $ ) {
 			{ data: 'billing' },
 			{ data: 'cycle' },
 			{ data: 'billing_limit_display' },
-			{ data: 'trial_enabled' },
 			{ data: 'trial' },
 			{ data: 'trial_limit_display' },
 			{ data: 'expiration' },
@@ -102,6 +101,11 @@ jQuery( document ).ready( function( $ ) {
 		order: [ defaultOrder ],
 		stateSave: true,
 		stateDuration: -1,
+		language: {
+			info: "Showing _START_ to _END_ of _TOTAL_ entries",
+			infoEmpty: "Showing 0 to 0 of 0 entries",
+			infoFiltered: "(filtered from _MAX_ total entries)"
+		},
 		initComplete: function() {
 			var api = this.api();
 			var filters = $( '#table-filters' );
@@ -126,10 +130,57 @@ jQuery( document ).ready( function( $ ) {
 					row.child( formatChildRow( row.data() ) ).show();
 					tr.addClass( 'shown' );
 				}
+				
+				// Update expand/collapse all button text
+				updateExpandAllButton();
 			} );
+			
+			// Function to update expand/collapse all button text
+			function updateExpandAllButton() {
+				var totalRows = api.rows().count();
+				var expandedRows = api.rows().nodes().to$().filter( '.shown' ).length;
+				var btn = $( '#table-filters button' ).first();
+				
+				if ( expandedRows === totalRows && totalRows > 0 ) {
+					btn.text( 'Collapse All' );
+				} else {
+					btn.text( 'Expand All' );
+				}
+			}
 
-			// Add filter dropdowns for Group, Cycle, Trial Enabled, Expiration, Allow Signups.
-			api.columns( [ 3, 8, 10, 13, 14 ] ).every( function() {
+			// Add expand/collapse all button.
+			var expandAllBtn = $( '<button type="button" class="button">Expand All</button>' )
+				.appendTo( filters )
+				.on( 'click', function() {
+					var btn = $( this );
+					var isExpanded = btn.text() === 'Collapse All';
+					
+					if ( isExpanded ) {
+						// Collapse all rows
+						api.rows().every( function() {
+							if ( this.child.isShown() ) {
+								this.child.hide();
+								$( this.node() ).removeClass( 'shown' );
+							}
+						} );
+						btn.text( 'Expand All' );
+					} else {
+						// Expand all rows
+						api.rows().every( function() {
+							if ( ! this.child.isShown() ) {
+								this.child( formatChildRow( this.data() ) ).show();
+								$( this.node() ).addClass( 'shown' );
+							}
+						} );
+						btn.text( 'Collapse All' );
+					}
+				} );
+
+			// Add filter dropdowns for Group, Cycle, Billing Limit, Expiration, Allow Signups.
+			var currentTrialFilter = null;
+			var trialEnabledFilter = null;
+			
+			api.columns( [ 2, 7, 8, 11, 12 ] ).every( function() {
 				var column = this;
 				var columnIndex = column.index();
 				var title = $( column.header() ).text();
@@ -142,7 +193,7 @@ jQuery( document ).ready( function( $ ) {
 
 				// For Allow Signups column, use signups_filter field
 				var uniqueValues = {};
-				if ( columnIndex === 14 ) {
+				if ( columnIndex === 12 ) {
 					api.rows().data().each( function( row ) {
 						var val = row.signups_filter;
 						if ( val && ! uniqueValues[ val ] ) {
@@ -166,6 +217,46 @@ jQuery( document ).ready( function( $ ) {
 				if ( savedSearch ) {
 					select.val( savedSearch );
 				}
+				
+				// Add Custom Trials filter after Billing Limit dropdown (column index 8)
+				if ( columnIndex === 8 ) {
+					trialEnabledFilter = $( '<select><option value="">Custom Trials</option><option value="Enabled">Enabled</option><option value="Disabled">Disabled</option></select>' )
+						.appendTo( filters )
+						.on( 'change', function() {
+							var filterValue = $( this ).val();
+							
+							// Remove previous custom search function
+							if ( currentTrialFilter ) {
+								var index = $.fn.dataTable.ext.search.indexOf( currentTrialFilter );
+								if ( index !== -1 ) {
+									$.fn.dataTable.ext.search.splice( index, 1 );
+								}
+							}
+							
+							if ( filterValue === '' ) {
+								currentTrialFilter = null;
+							} else {
+								// Add new custom search function
+								currentTrialFilter = function( settings, data, dataIndex ) {
+									if ( settings.nTable.id !== 'levels-table' ) {
+										return true;
+									}
+									var rowData = api.row( dataIndex ).data();
+									var isTrialEnabled = rowData.trial_enabled === 'Enabled';
+									
+									if ( filterValue === 'Enabled' && isTrialEnabled ) {
+										return true;
+									} else if ( filterValue === 'Disabled' && !isTrialEnabled ) {
+										return true;
+									}
+									return filterValue === '';
+								};
+								$.fn.dataTable.ext.search.push( currentTrialFilter );
+							}
+							
+							api.draw();
+						} );
+				}
 			} );
 
 			// Add reset filters button.
@@ -176,6 +267,20 @@ jQuery( document ).ready( function( $ ) {
 					$( '#table-filters select' ).val( '' );
 					api.search( '' ).columns().search( '' );
 					
+					// Clear custom trial filter
+					if ( currentTrialFilter ) {
+						var index = $.fn.dataTable.ext.search.indexOf( currentTrialFilter );
+						if ( index !== -1 ) {
+							$.fn.dataTable.ext.search.splice( index, 1 );
+						}
+						currentTrialFilter = null;
+					}
+					
+					// Reset trial enabled filter dropdown
+					if ( trialEnabledFilter ) {
+						trialEnabledFilter.val( '' );
+					}
+					
 					// Reset to default page length and order
 					api.page.len( pageLength );
 					api.order( defaultOrder );
@@ -183,6 +288,15 @@ jQuery( document ).ready( function( $ ) {
 					// Clear saved state and redraw
 					api.state.clear();
 					api.draw();
+					
+					// Collapse all rows and reset expand/collapse button
+					api.rows().every( function() {
+						if ( this.child.isShown() ) {
+							this.child.hide();
+							$( this.node() ).removeClass( 'shown' );
+						}
+					} );
+					expandAllBtn.text( 'Expand All' );
 				} );
 		}
 	} );

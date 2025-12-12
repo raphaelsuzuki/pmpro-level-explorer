@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1] - 2025-12-12
+
+### Added
+- Expand All/Collapse All button for managing all child rows at once
+- Custom Trials filter dropdown (independent of column display)
+
+### Changed
+- Merged DataTables control (expand/collapse caret) with ID column to save horizontal space
+- Removed Custom Trial column but kept filter functionality
+- Repositioned Custom Trials filter after Billing Limits dropdown for better organization
+- Made "Yes" in Allow Signups column clickable (removed redundant "Checkout" text)
+
+### Fixed
+- Custom Trials filter now properly resets with Reset Filters button
+- Improved filter dropdown positioning and organization
+- Enhanced expand/collapse button state management
+
 ## [1.4.0] - 2025-12-09
 
 ### Added
@@ -103,7 +120,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full phpDoc documentation
 - Git Updater support for automatic updates
 
-[unreleased]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.4.0...HEAD
+[unreleased]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.3.5...v1.4.0
 [1.3.5]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.3.0...v1.3.5
 [1.3.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.2.0...v1.3.0

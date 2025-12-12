@@ -115,7 +115,6 @@ class PMPRO_Level_Explorer_Admin {
 				<table id="levels-table" class="widefat display" style="width:100%">
 					<thead>
 						<tr>
-							<th></th>
 							<th><?php esc_html_e( 'ID', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Name', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Group', 'pmpro-level-explorer' ); ?></th>
@@ -125,7 +124,6 @@ class PMPRO_Level_Explorer_Admin {
 							<th><?php esc_html_e( 'Billing Amount', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Billing Cycle', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Billing Limit', 'pmpro-level-explorer' ); ?></th>
-							<th><?php esc_html_e( 'Custom Trial', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Trial Amount', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Trial Limit', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Expiration', 'pmpro-level-explorer' ); ?></th>
@@ -271,7 +269,7 @@ class PMPRO_Level_Explorer_Admin {
 				'trial'                 => $trial,
 				'trial_limit_display'   => $l->trial_limit > 0 ? $l->trial_limit : '-',
 				'expiration'            => $l->expiration_number > 0 ? $l->expiration_number . ' ' . $l->expiration_period : 'Never',
-				'signups'               => $l->allow_signups ? 'Yes (<a href="' . esc_url( pmpro_url( 'checkout', '?level=' . $l->id ) ) . '" target="_blank">Checkout</a>)' : 'No',
+				'signups'               => $l->allow_signups ? '<a href="' . esc_url( pmpro_url( 'checkout', '?level=' . $l->id ) ) . '" target="_blank">Yes</a>' : 'No',
 				'signups_filter'        => $l->allow_signups ? 'Yes' : 'No',
 				'actions'               => '<a href="' . esc_url( admin_url( 'admin.php?page=pmpro-membershiplevels&edit=' . $l->id ) ) . '">' . esc_html__( 'Edit', 'pmpro-level-explorer' ) . '</a> | ' .
 					'<a href="' . esc_url( admin_url( 'admin.php?page=pmpro-membershiplevels&edit=-1&copy=' . $l->id ) ) . '">' . esc_html__( 'Copy', 'pmpro-level-explorer' ) . '</a> | ' .
