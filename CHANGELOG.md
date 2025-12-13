@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.3] - 2025-12-13
+
+### Changed
+- Replaced manual search placeholder setting with native DataTables `language.searchPlaceholder` option
+- Simplified Reset Filters functionality using DataTables method chaining for better performance
+- Optimized filter value collection using native array methods and functional programming
+- Removed unnecessary render function from ID column that just returned data as-is
+
+### Improved
+- Reduced custom DOM manipulation in favor of native DataTables features
+- Better performance with fewer DOM updates through method chaining
+- Cleaner, more maintainable code following DataTables best practices
+- More efficient unique value filtering for dropdown options
+
 ## [1.4.2] - 2025-12-13
 
 ### Added
@@ -136,7 +150,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full phpDoc documentation
 - Git Updater support for automatic updates
 
-[unreleased]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.4.2...HEAD
+[unreleased]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.4.3...HEAD
+[1.4.3]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.4.2...v1.4.3
 [1.4.2]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.3.5...v1.4.0

@@ -22,7 +22,7 @@ Enhanced level management for Paid Memberships Pro with advanced filtering, sort
 - **PHP:** 7.4 or higher  
 - **Paid Memberships Pro:** Latest version recommended
 - **Tested up to:** WordPress 6.4
-- **Stable tag:** 1.4.2
+- **Stable tag:** 1.4.3
 
 ## Installation
 
@@ -181,6 +181,9 @@ No, it only reads from PMPro's existing tables.
 See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## Upgrade Notice
+
+### 1.4.3
+Code optimization release: Replaced custom DOM manipulation with native DataTables features. Improved performance and maintainability.
 
 ### 1.4.2
 Simplified Custom Trials filter using native DataTables features. Added configurable state saving option. Significantly reduced code complexity.

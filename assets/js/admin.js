@@ -69,10 +69,7 @@ jQuery( document ).ready( function( $ ) {
 		columns: [
 			{ 
 				data: 'id',
-				className: 'dt-control',
-				render: function ( data, type, row ) {
-					return data;
-				}
+				className: 'dt-control'
 			},
 			{ data: 'name' },
 			{ data: 'group' },
@@ -113,7 +110,8 @@ jQuery( document ).ready( function( $ ) {
 		language: {
 			info: "Showing _START_ to _END_ of _TOTAL_ entries",
 			infoEmpty: "Showing 0 to 0 of 0 entries",
-			infoFiltered: "(filtered from _MAX_ total entries)"
+			infoFiltered: "(filtered from _MAX_ total entries)",
+			searchPlaceholder: "Search..."
 		},
 		initComplete: function() {
 			var api = this.api();
@@ -125,7 +123,7 @@ jQuery( document ).ready( function( $ ) {
 			// Add pmpro_section_actions class to the last dt-layout-row
 			$( '#levels-table_wrapper > .dt-layout-row' ).last().addClass( 'pmpro_section_actions' );
 
-			$( '.dt-search input' ).attr( 'placeholder', 'Search...' );
+
 
 			// Add click event for expanding/collapsing child rows
 			$( '#levels-table tbody' ).on( 'click', 'td.dt-control', function() {
@@ -197,24 +195,18 @@ jQuery( document ).ready( function( $ ) {
 						column.search( $( this ).val(), { exact: true } ).draw();
 					} );
 
-				// For Allow Signups column, use signups_filter field
-				var uniqueValues = {};
+				// Get unique values for this column
+				var uniqueValues = [];
 				if ( columnIndex === 13 ) {
-					api.rows().data().each( function( row ) {
-						var val = row.signups_filter;
-						if ( val && ! uniqueValues[ val ] ) {
-							uniqueValues[ val ] = true;
-						}
-					} );
+					// For Allow Signups column, use signups_filter field
+					uniqueValues = api.rows().data().toArray()
+						.map( function( row ) { return row.signups_filter; } )
+						.filter( function( val, index, arr ) { return val && arr.indexOf( val ) === index; } );
 				} else {
-					column.data().unique().each( function( d ) {
-						if ( d && ! uniqueValues[ d ] ) {
-							uniqueValues[ d ] = true;
-						}
-					} );
+					uniqueValues = column.data().unique().toArray().filter( Boolean );
 				}
 
-				Object.keys( uniqueValues ).sort().forEach( function( val ) {
+				uniqueValues.sort().forEach( function( val ) {
 					select.append( '<option value="' + val + '">' + val + '</option>' );
 				} );
 
@@ -229,19 +221,19 @@ jQuery( document ).ready( function( $ ) {
 			$( '<button type="button" class="button">Reset Filters</button>' )
 				.appendTo( filters )
 				.on( 'click', function() {
-					// Clear filters and search
+					// Reset all filters and search
 					$( '#table-filters select' ).val( '' );
-					api.search( '' ).columns().search( '' );
+					api.search( '' ).columns().search( '' ).draw();
 					
-					// Reset to default page length and order
-					api.page.len( pageLength );
-					api.order( defaultOrder );
+					// Reset table settings to defaults
+					api.page.len( pageLength ).order( defaultOrder ).draw();
 					
-					// Clear saved state and redraw
-					api.state.clear();
-					api.draw();
+					// Clear saved state
+					if ( stateSave ) {
+						api.state.clear();
+					}
 					
-					// Collapse all rows and reset expand/collapse button
+					// Reset expand/collapse functionality
 					api.rows().every( function() {
 						if ( this.child.isShown() ) {
 							this.child.hide();
