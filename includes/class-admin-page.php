@@ -72,6 +72,7 @@ class PMPRO_Level_Explorer_Admin {
 			$default_order = apply_filters( 'pmpro_level_explorer_default_order', array( 1, 'desc' ) );
 			$page_length   = apply_filters( 'pmpro_level_explorer_page_length', 25 );
 			$length_menu   = apply_filters( 'pmpro_level_explorer_length_menu', array( 25, 50, 100, 500 ) );
+			$state_save    = apply_filters( 'pmpro_level_explorer_state_save', true );
 
 			wp_enqueue_style( 'pmpro-admin', plugins_url( 'paid-memberships-pro/css/admin.css' ), array(), PMPRO_VERSION );
 			wp_enqueue_style( 'datatables', PMPRO_LEVEL_EXPLORER_URL . 'assets/css/datatables/dataTables.dataTables.min.css', array(), PMPRO_LEVEL_EXPLORER_VERSION );
@@ -86,6 +87,7 @@ class PMPRO_Level_Explorer_Admin {
 					'defaultOrder' => $default_order,
 					'pageLength'   => $page_length,
 					'lengthMenu'   => $length_menu,
+					'stateSave'    => $state_save,
 				)
 			);
 		}
@@ -126,6 +128,7 @@ class PMPRO_Level_Explorer_Admin {
 							<th><?php esc_html_e( 'Billing Limit', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Trial Amount', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Trial Limit', 'pmpro-level-explorer' ); ?></th>
+							<th><?php esc_html_e( 'Custom Trial', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Expiration', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Allow Signups', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Actions', 'pmpro-level-explorer' ); ?></th>
@@ -268,6 +271,7 @@ class PMPRO_Level_Explorer_Admin {
 				'trial_enabled'         => $trial_enabled,
 				'trial'                 => $trial,
 				'trial_limit_display'   => $l->trial_limit > 0 ? $l->trial_limit : '-',
+				'custom_trial'          => $trial_enabled,
 				'expiration'            => $l->expiration_number > 0 ? $l->expiration_number . ' ' . $l->expiration_period : 'Never',
 				'signups'               => $l->allow_signups ? '<a href="' . esc_url( pmpro_url( 'checkout', '?level=' . $l->id ) ) . '" target="_blank">Yes</a>' : 'No',
 				'signups_filter'        => $l->allow_signups ? 'Yes' : 'No',

@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.2] - 2025-12-13
+
+### Added
+- Hidden Custom Trial column for native DataTables filtering
+- `pmpro_level_explorer_state_save` filter to disable table state persistence
+
+### Changed
+- Simplified Custom Trials filter using DataTables native columnDefs instead of complex custom logic
+- Removed manual state management for Custom Trials filter in favor of native column filtering
+- Uses DataTables `columnDefs` with `visible: false` for proper column hiding
+
+### Fixed
+- Custom Trials filter now uses native DataTables state saving/restoration
+- Significantly reduced code complexity (~50 lines of custom logic removed)
+- More reliable and maintainable filter implementation
+
 ## [1.4.1] - 2025-12-12
 
 ### Added
@@ -120,7 +136,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full phpDoc documentation
 - Git Updater support for automatic updates
 
-[unreleased]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.4.1...HEAD
+[unreleased]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.4.2...HEAD
+[1.4.2]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.3.5...v1.4.0
 [1.3.5]: https://github.com/raphaelsuzuki/pmpro-level-explorer/compare/v1.3.0...v1.3.5

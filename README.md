@@ -18,9 +18,11 @@ Enhanced level management for Paid Memberships Pro with advanced filtering, sort
 
 ## Requirements
 
-- WordPress 5.0+
-- PHP 7.4+
-- Paid Memberships Pro (active)
+- **WordPress:** 5.0 or higher
+- **PHP:** 7.4 or higher  
+- **Paid Memberships Pro:** Latest version recommended
+- **Tested up to:** WordPress 6.4
+- **Stable tag:** 1.4.2
 
 ## Installation
 
@@ -38,6 +40,9 @@ This plugin supports automatic updates through [Git Updater](https://git-updater
 2. Install this plugin using any method above
 3. Git Updater will automatically check for updates from the GitHub repository
 4. Update notifications will appear in your WordPress admin dashboard
+
+**Repository:** `raphaelsuzuki/pmpro-level-explorer`  
+**Branch:** `main`
 
 ## Usage
 
@@ -100,10 +105,21 @@ Choose to display 25, 50, 100, or 500 levels per page.
 - **Copy** - Creates a copy of the level
 - **Delete** - Deletes the level (with confirmation)
 
+## Screenshots
 
-## Developer Hooks
+1. **Main Level Explorer Interface** - Enhanced DataTables view with filtering, search, and expandable rows
+2. **Expanded Row Details** - View level descriptions, messages, and protected content
+3. **Advanced Filtering** - Multiple filter dropdowns for efficient level management
+4. **State Persistence** - Table remembers your preferences across sessions
 
-### Customize Default Sorting
+
+## For Developers
+
+### Hooks and Filters
+
+The plugin provides several hooks for customization:
+
+#### Customize Default Sorting
 
 Change the default sort column and direction:
 
@@ -114,7 +130,7 @@ add_filter( 'pmpro_level_explorer_default_order', function( $order ) {
 } );
 ```
 
-### Customize Page Length
+#### Customize Page Length
 
 Change the default number of levels per page:
 
@@ -124,7 +140,7 @@ add_filter( 'pmpro_level_explorer_page_length', function( $length ) {
 } );
 ```
 
-### Customize Length Menu
+#### Customize Length Menu
 
 Change the available page length options:
 
@@ -132,6 +148,14 @@ Change the available page length options:
 add_filter( 'pmpro_level_explorer_length_menu', function( $menu ) {
     return array( 10, 25, 50, 100 ); // Custom options
 } );
+```
+
+#### Disable State Saving
+
+Disable table state persistence (sort order, filters, search, etc.):
+
+```php
+add_filter( 'pmpro_level_explorer_state_save', '__return_false' );
 ```
 
 ## Frequently Asked Questions
@@ -156,9 +180,33 @@ No, it only reads from PMPro's existing tables.
 
 See [CHANGELOG.md](CHANGELOG.md) for version history.
 
+## Upgrade Notice
+
+### 1.4.2
+Simplified Custom Trials filter using native DataTables features. Added configurable state saving option. Significantly reduced code complexity.
+
+### 1.4.1
+Enhanced UI with better filter organization and expand/collapse functionality. Custom Trials filter repositioned for better UX.
+
+### 1.4.0
+Major update: Added table state persistence, expand/collapse all functionality, and improved filter management.
+
+### 1.3.5
+Added Orders column, checkout links, and enhanced child row details. Improved space utilization and user experience.
+
+## Support
+
+- **Issues:** [GitHub Issues](https://github.com/raphaelsuzuki/pmpro-level-explorer/issues)
+- **Documentation:** This README and inline help
+- **Updates:** Automatic via Git Updater
+
 ## Contributing
 
 Contributions are welcome! Please submit pull requests or open issues on GitHub.
+
+- **Repository:** https://github.com/raphaelsuzuki/pmpro-level-explorer
+- **Bug Reports:** Use GitHub Issues for bug reports and feature requests
+- **Pull Requests:** Follow WordPress Coding Standards
 
 ## License
 

@@ -10,6 +10,7 @@ jQuery( document ).ready( function( $ ) {
 	var defaultOrder = pmproLevelExplorer.defaultOrder || [ 0, 'desc' ];
 	var pageLength = pmproLevelExplorer.pageLength || 25;
 	var lengthMenu = pmproLevelExplorer.lengthMenu || [ 25, 50, 100, 500 ];
+	var stateSave = pmproLevelExplorer.stateSave !== undefined ? pmproLevelExplorer.stateSave : true;
 
 	// Function to format child row content
 	function formatChildRow( d ) {
@@ -83,6 +84,7 @@ jQuery( document ).ready( function( $ ) {
 			{ data: 'billing_limit_display' },
 			{ data: 'trial' },
 			{ data: 'trial_limit_display' },
+			{ data: 'custom_trial' },
 			{ data: 'expiration' },
 			{
 				data: 'signups',
@@ -99,8 +101,15 @@ jQuery( document ).ready( function( $ ) {
 		pageLength: pageLength,
 		lengthMenu: lengthMenu,
 		order: [ defaultOrder ],
-		stateSave: true,
-		stateDuration: -1,
+		stateSave: stateSave,
+		stateDuration: stateSave ? -1 : 0,
+		columnDefs: [
+			{
+				target: 11, // Custom Trial column
+				visible: false,
+				searchable: true
+			}
+		],
 		language: {
 			info: "Showing _START_ to _END_ of _TOTAL_ entries",
 			infoEmpty: "Showing 0 to 0 of 0 entries",
@@ -176,11 +185,8 @@ jQuery( document ).ready( function( $ ) {
 					}
 				} );
 
-			// Add filter dropdowns for Group, Cycle, Billing Limit, Expiration, Allow Signups.
-			var currentTrialFilter = null;
-			var trialEnabledFilter = null;
-			
-			api.columns( [ 2, 7, 8, 11, 12 ] ).every( function() {
+			// Add filter dropdowns for Group, Cycle, Billing Limit, Custom Trial, Expiration, Allow Signups.
+			api.columns( [ 2, 7, 8, 11, 12, 13 ] ).every( function() {
 				var column = this;
 				var columnIndex = column.index();
 				var title = $( column.header() ).text();
@@ -193,7 +199,7 @@ jQuery( document ).ready( function( $ ) {
 
 				// For Allow Signups column, use signups_filter field
 				var uniqueValues = {};
-				if ( columnIndex === 12 ) {
+				if ( columnIndex === 13 ) {
 					api.rows().data().each( function( row ) {
 						var val = row.signups_filter;
 						if ( val && ! uniqueValues[ val ] ) {
@@ -217,46 +223,6 @@ jQuery( document ).ready( function( $ ) {
 				if ( savedSearch ) {
 					select.val( savedSearch );
 				}
-				
-				// Add Custom Trials filter after Billing Limit dropdown (column index 8)
-				if ( columnIndex === 8 ) {
-					trialEnabledFilter = $( '<select><option value="">Custom Trials</option><option value="Enabled">Enabled</option><option value="Disabled">Disabled</option></select>' )
-						.appendTo( filters )
-						.on( 'change', function() {
-							var filterValue = $( this ).val();
-							
-							// Remove previous custom search function
-							if ( currentTrialFilter ) {
-								var index = $.fn.dataTable.ext.search.indexOf( currentTrialFilter );
-								if ( index !== -1 ) {
-									$.fn.dataTable.ext.search.splice( index, 1 );
-								}
-							}
-							
-							if ( filterValue === '' ) {
-								currentTrialFilter = null;
-							} else {
-								// Add new custom search function
-								currentTrialFilter = function( settings, data, dataIndex ) {
-									if ( settings.nTable.id !== 'levels-table' ) {
-										return true;
-									}
-									var rowData = api.row( dataIndex ).data();
-									var isTrialEnabled = rowData.trial_enabled === 'Enabled';
-									
-									if ( filterValue === 'Enabled' && isTrialEnabled ) {
-										return true;
-									} else if ( filterValue === 'Disabled' && !isTrialEnabled ) {
-										return true;
-									}
-									return filterValue === '';
-								};
-								$.fn.dataTable.ext.search.push( currentTrialFilter );
-							}
-							
-							api.draw();
-						} );
-				}
 			} );
 
 			// Add reset filters button.
@@ -266,20 +232,6 @@ jQuery( document ).ready( function( $ ) {
 					// Clear filters and search
 					$( '#table-filters select' ).val( '' );
 					api.search( '' ).columns().search( '' );
-					
-					// Clear custom trial filter
-					if ( currentTrialFilter ) {
-						var index = $.fn.dataTable.ext.search.indexOf( currentTrialFilter );
-						if ( index !== -1 ) {
-							$.fn.dataTable.ext.search.splice( index, 1 );
-						}
-						currentTrialFilter = null;
-					}
-					
-					// Reset trial enabled filter dropdown
-					if ( trialEnabledFilter ) {
-						trialEnabledFilter.val( '' );
-					}
 					
 					// Reset to default page length and order
 					api.page.len( pageLength );
