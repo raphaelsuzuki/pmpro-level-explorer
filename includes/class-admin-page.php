@@ -257,7 +257,7 @@ class PMPRO_Level_Explorer_Admin {
 				'name'                  => $l->name,
 				'description'           => $l->description ? wp_kses_post( $l->description ) : '',
 				'confirmation'          => $l->confirmation ? wp_kses_post( $l->confirmation ) : '',
-				'account_message'       => isset( $l->account_message ) ? wp_kses_post( $l->account_message ) : '',
+				'account_message'       => function_exists( 'get_pmpro_membership_level_meta' ) ? wp_kses_post( get_pmpro_membership_level_meta( $l->id, 'membership_account_message', true ) ) : '',
 				'group'                 => $group,
 				'members'               => isset( $member_counts[ $l->id ] ) && $member_counts[ $l->id ] > 0 ? '<a href="' . esc_url( admin_url( 'admin.php?page=pmpro-memberslist&l=' . $l->id ) ) . '">' . $member_counts[ $l->id ] . '</a>' : 0,
 				'orders'                => isset( $order_counts[ $l->id ] ) && $order_counts[ $l->id ] > 0 ? '<a href="' . esc_url( admin_url( 'admin.php?page=pmpro-orders&l=' . $l->id . '&filter=within-a-level' ) ) . '">' . $order_counts[ $l->id ] . '</a>' : 0,
