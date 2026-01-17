@@ -3,7 +3,7 @@
  * Plugin Name: PMPro Level Explorer
  * Plugin URI: https://github.com/raphaelsuzuki/pmpro-level-explorer
  * Description: Enhanced level management with grouping, filtering, and search for Paid Memberships Pro
- * Version: 1.4.3
+ * Version: 1.5.0
  * Author: Raphael Suzuki
  * Author URI: https://github.com/raphaelsuzuki/
  * Text Domain: pmpro-level-explorer
@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
 
 // Define plugin constants.
 if ( ! defined( 'PMPRO_LEVEL_EXPLORER_VERSION' ) ) {
-	define( 'PMPRO_LEVEL_EXPLORER_VERSION', '1.4.3' );
+	define( 'PMPRO_LEVEL_EXPLORER_VERSION', '1.5.0' );
 }
 if ( ! defined( 'PMPRO_LEVEL_EXPLORER_DIR' ) ) {
 	define( 'PMPRO_LEVEL_EXPLORER_DIR', plugin_dir_path( __FILE__ ) );

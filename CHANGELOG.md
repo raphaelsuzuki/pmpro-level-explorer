@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2025-01-17
+
+### Added
+- New "Members/Orders" filter dropdown with options: Has Members, No Active Members, Has Orders, Never had Orders
+- Visual feedback for active filters - dropdown titles become bold and show selected option (e.g., "Custom Trials: Disabled")
+- Smooth table loading with fade-in effect to eliminate flashing on page load
+
+### Changed
+- Column "Billing Limit" renamed to "Recurring Limit" with improved display format showing "X Cycle(s)"
+- Billing cycle periods now display with "(s)" suffix (e.g., "2 Month(s)" instead of "2 Months")
+- Enhanced filter UX with prefix display showing filter category and selected value
+
+### Fixed
+- Resolved pagination issue where table rows were being appended/prepended instead of properly replaced
+- Improved DataTables DOM management and event handling for better stability
+
+### Improved
+- Refactored JavaScript code for better maintainability and performance
+- Enhanced state persistence for all filter types including the new Members/Orders filter
+- Better visual hierarchy with bold styling for active filter states
+
 ## [1.4.3] - 2025-12-13
 
 ### Changed
