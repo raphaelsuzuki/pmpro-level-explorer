@@ -131,6 +131,8 @@ class PMPRO_Level_Explorer_Admin {
 							<th><?php esc_html_e( 'Custom Trial', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Expiration', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Allow Signups', 'pmpro-level-explorer' ); ?></th>
+							<th><?php esc_html_e( 'Has Members', 'pmpro-level-explorer' ); ?></th>
+							<th><?php esc_html_e( 'Has Orders', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Actions', 'pmpro-level-explorer' ); ?></th>
 						</tr>
 					</thead>
@@ -176,6 +178,19 @@ class PMPRO_Level_Explorer_Admin {
 		);
 		foreach ( $results as $row ) {
 			$order_counts[ $row->membership_id ] = (int) $row->count;
+		}
+
+		// Get active subscription counts (for filtering purposes).
+		$active_subscription_counts = array();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$results = $wpdb->get_results(
+			"SELECT membership_id, COUNT(*) as count
+			FROM {$wpdb->pmpro_memberships_users}
+			WHERE status = 'active' AND enddate IS NULL OR enddate > NOW()
+			GROUP BY membership_id"
+		);
+		foreach ( $results as $row ) {
+			$active_subscription_counts[ $row->membership_id ] = (int) $row->count;
 		}
 
 		// Get group mappings.
@@ -252,6 +267,15 @@ class PMPRO_Level_Explorer_Admin {
 				'pmpro_membershiplevels_nonce'
 			);
 
+			// Get member and order counts for filtering
+			$member_count = isset( $member_counts[ $l->id ] ) ? $member_counts[ $l->id ] : 0;
+			$order_count = isset( $order_counts[ $l->id ] ) ? $order_counts[ $l->id ] : 0;
+			$active_subscription_count = isset( $active_subscription_counts[ $l->id ] ) ? $active_subscription_counts[ $l->id ] : 0;
+			
+			// Determine member/order status for filtering
+			$has_members = $member_count > 0 ? 'Has Members' : 'No Active Members';
+			$has_orders = $order_count > 0 ? 'Has Orders' : 'Never had Orders';
+
 			$data[] = array(
 				'id'                    => (int) $l->id,
 				'name'                  => $l->name,
@@ -287,6 +311,11 @@ class PMPRO_Level_Explorer_Admin {
 				'billing_limit'         => (int) $l->billing_limit,
 				'expiration_number'     => (int) $l->expiration_number,
 				'expiration_period'     => $l->expiration_period ? $l->expiration_period : 'Never',
+				'has_members'           => $has_members,
+				'has_orders'            => $has_orders,
+				'member_count_raw'      => $member_count,
+				'order_count_raw'       => $order_count,
+				'active_subscription_count' => $active_subscription_count,
 			);
 		}
 

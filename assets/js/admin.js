@@ -93,6 +93,8 @@ jQuery( document ).ready( function( $ ) {
 					return data;
 				}
 			},
+			{ data: 'has_members' },
+			{ data: 'has_orders' },
 			{ data: 'actions', orderable: false }
 		],
 		pageLength: pageLength,
@@ -102,7 +104,7 @@ jQuery( document ).ready( function( $ ) {
 		stateDuration: stateSave ? -1 : 0,
 		columnDefs: [
 			{
-				target: 11, // Custom Trial column
+				targets: [ 11, 14, 15 ], // Custom Trial, Has Members, Has Orders columns
 				visible: false,
 				searchable: true
 			}
@@ -217,12 +219,49 @@ jQuery( document ).ready( function( $ ) {
 				}
 			} );
 
+			// Add Members/Orders filter dropdown
+			var membersOrdersSelect = $( '<select><option value="">Members/Orders</option></select>' )
+				.appendTo( filters )
+				.on( 'change', function() {
+					var filterValue = $( this ).val();
+					
+					if ( filterValue === 'Has Members' ) {
+						api.column( 14 ).search( 'Has Members', { exact: true } ).draw();
+					} else if ( filterValue === 'No Active Members' ) {
+						api.column( 14 ).search( 'No Active Members', { exact: true } ).draw();
+					} else if ( filterValue === 'Has Orders' ) {
+						api.column( 15 ).search( 'Has Orders', { exact: true } ).draw();
+					} else if ( filterValue === 'Never had Orders' ) {
+						api.column( 15 ).search( 'Never had Orders', { exact: true } ).draw();
+					} else {
+						// Clear both columns
+						api.column( 14 ).search( '' ).draw();
+						api.column( 15 ).search( '' ).draw();
+					}
+				} );
+
+			// Add options for Members/Orders filter
+			membersOrdersSelect.append( '<option value="Has Members">Has Members</option>' );
+			membersOrdersSelect.append( '<option value="No Active Members">No Active Members</option>' );
+			membersOrdersSelect.append( '<option value="Has Orders">Has Orders</option>' );
+			membersOrdersSelect.append( '<option value="Never had Orders">Never had Orders</option>' );
+
+			// Restore saved filter value for Members/Orders
+			var savedMembersSearch = api.column( 14 ).search();
+			var savedOrdersSearch = api.column( 15 ).search();
+			if ( savedMembersSearch ) {
+				membersOrdersSelect.val( savedMembersSearch );
+			} else if ( savedOrdersSearch ) {
+				membersOrdersSelect.val( savedOrdersSearch );
+			}
+
 			// Add reset filters button.
 			$( '<button type="button" class="button">Reset Filters</button>' )
 				.appendTo( filters )
 				.on( 'click', function() {
 					// Reset all filters and search
 					$( '#table-filters select' ).val( '' );
+					
 					api.search( '' ).columns().search( '' ).draw();
 					
 					// Reset table settings to defaults
