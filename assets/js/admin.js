@@ -119,16 +119,11 @@ jQuery( document ).ready( function( $ ) {
 			var api = this.api();
 			var filters = $( '#table-filters' );
 
-			// Show the table smoothly after initialization
-			$( '#levels-table' ).addClass( 'dt-ready' );
-
 			// Add pmpro_section_inside class to the wrapper
 			$( '#levels-table_wrapper' ).addClass( 'pmpro_section_inside' );
 
 			// Add pmpro_section_actions class to the last dt-layout-row
 			$( '#levels-table_wrapper > .dt-layout-row' ).last().addClass( 'pmpro_section_actions' );
-
-
 
 			// Add click event for expanding/collapsing child rows
 			$( '#levels-table tbody' ).on( 'click', 'td.dt-control', function() {
@@ -249,19 +244,23 @@ jQuery( document ).ready( function( $ ) {
 					var filterValue = $( this ).val();
 					var $this = $( this );
 					
+					// Clear both columns first
+					api.column( 14 ).search( '' );
+					api.column( 15 ).search( '' );
+					
+					// Apply the appropriate filter
 					if ( filterValue === 'Has Members' ) {
-						api.column( 14 ).search( 'Has Members', { exact: true } ).draw();
+						api.column( 14 ).search( 'Has Members', { exact: true } );
 					} else if ( filterValue === 'No Active Members' ) {
-						api.column( 14 ).search( 'No Active Members', { exact: true } ).draw();
+						api.column( 14 ).search( 'No Active Members', { exact: true } );
 					} else if ( filterValue === 'Has Orders' ) {
-						api.column( 15 ).search( 'Has Orders', { exact: true } ).draw();
+						api.column( 15 ).search( 'Has Orders', { exact: true } );
 					} else if ( filterValue === 'Never had Orders' ) {
-						api.column( 15 ).search( 'Never had Orders', { exact: true } ).draw();
-					} else {
-						// Clear both columns
-						api.column( 14 ).search( '' ).draw();
-						api.column( 15 ).search( '' ).draw();
+						api.column( 15 ).search( 'Never had Orders', { exact: true } );
 					}
+					
+					// Single draw call after all filters are set
+					api.draw();
 					
 					// Use setTimeout to prevent flashing
 					setTimeout( function() {
