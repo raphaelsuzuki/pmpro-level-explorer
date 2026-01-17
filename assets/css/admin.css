@@ -95,3 +95,28 @@ div.dt-container .dt-length select.dt-input {
 #levels-table td.dt-control::before {
 	margin-right: 8px;
 }
+
+/* Hide table during initialization to prevent flashing */
+#levels-table {
+	opacity: 0;
+	transition: opacity 0.2s ease-in-out;
+}
+
+#levels-table.dt-ready {
+	opacity: 1;
+}
+
+/* Filter dropdown styling */
+#table-filters select {
+	font-weight: normal;
+}
+
+/* Make dropdown text bold when a filter is active (contains colon) */
+#table-filters select option[value=""]:only-child {
+	font-weight: normal;
+}
+
+/* Custom styling for active filter dropdowns */
+#table-filters select.filter-active {
+	font-weight: bold;
+}

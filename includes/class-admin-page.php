@@ -125,7 +125,7 @@ class PMPRO_Level_Explorer_Admin {
 							<th><?php esc_html_e( 'Initial Payment', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Billing Amount', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Billing Cycle', 'pmpro-level-explorer' ); ?></th>
-							<th><?php esc_html_e( 'Billing Limit', 'pmpro-level-explorer' ); ?></th>
+							<th><?php esc_html_e( 'Recurring Limit', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Trial Amount', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Trial Limit', 'pmpro-level-explorer' ); ?></th>
 							<th><?php esc_html_e( 'Custom Trial', 'pmpro-level-explorer' ); ?></th>
@@ -257,7 +257,7 @@ class PMPRO_Level_Explorer_Admin {
 				$group = implode( ', ', $formatted_groups );
 			}
 			
-			$cycle         = $l->cycle_number > 0 ? $l->cycle_number . ' ' . $l->cycle_period . ( $l->cycle_number > 1 ? 's' : '' ) : '-';
+			$cycle         = $l->cycle_number > 0 ? $l->cycle_number . ' ' . $l->cycle_period . '(s)' : '-';
 			$trial         = $l->trial_amount > 0 ? '$' . number_format( $l->trial_amount, 2 ) : '-';
 			$trial_enabled = $l->trial_amount > 0 || $l->trial_limit > 0 ? 'Enabled' : 'Disabled';
 
@@ -291,7 +291,7 @@ class PMPRO_Level_Explorer_Admin {
 				'initial'               => $l->initial_payment > 0 ? '$' . number_format( $l->initial_payment, 2 ) : '-',
 				'billing'               => $l->billing_amount > 0 ? '$' . number_format( $l->billing_amount, 2 ) : '-',
 				'cycle'                 => $cycle,
-				'billing_limit_display' => $l->billing_limit > 0 ? $l->billing_limit : 'Unlimited',
+				'billing_limit_display' => $l->billing_limit > 0 ? $l->billing_limit . ' Cycle(s)' : 'Unlimited',
 				'trial_enabled'         => $trial_enabled,
 				'trial'                 => $trial,
 				'trial_limit_display'   => $l->trial_limit > 0 ? $l->trial_limit : '-',

@@ -119,6 +119,9 @@ jQuery( document ).ready( function( $ ) {
 			var api = this.api();
 			var filters = $( '#table-filters' );
 
+			// Show the table smoothly after initialization
+			$( '#levels-table' ).addClass( 'dt-ready' );
+
 			// Add pmpro_section_inside class to the wrapper
 			$( '#levels-table_wrapper' ).addClass( 'pmpro_section_inside' );
 
@@ -194,7 +197,24 @@ jQuery( document ).ready( function( $ ) {
 				var select = $( '<select><option value="">' + label + '</option></select>' )
 					.appendTo( filters )
 					.on( 'change', function() {
-						column.search( $( this ).val(), { exact: true } ).draw();
+						var selectedValue = $( this ).val();
+						var $this = $( this );
+						
+						column.search( selectedValue, { exact: true } ).draw();
+						
+						// Use setTimeout to prevent flashing
+						setTimeout( function() {
+							// Update the first option text to show the filter when something is selected
+							if ( selectedValue ) {
+								$this.find( 'option[value=""]' ).text( title + ': ' + selectedValue );
+								$this.addClass( 'filter-active' );
+								// Reset to show the updated first option
+								$this.val( '' );
+							} else {
+								$this.find( 'option[value=""]' ).text( label );
+								$this.removeClass( 'filter-active' );
+							}
+						}, 0 );
 					} );
 
 				// Get unique values for this column
@@ -215,7 +235,10 @@ jQuery( document ).ready( function( $ ) {
 				// Restore saved filter value from state
 				var savedSearch = column.search();
 				if ( savedSearch ) {
-					select.val( savedSearch );
+					// Update the first option text to show the restored filter
+					select.find( 'option[value=""]' ).text( title + ': ' + savedSearch );
+					select.addClass( 'filter-active' );
+					select.val( '' );
 				}
 			} );
 
@@ -224,6 +247,7 @@ jQuery( document ).ready( function( $ ) {
 				.appendTo( filters )
 				.on( 'change', function() {
 					var filterValue = $( this ).val();
+					var $this = $( this );
 					
 					if ( filterValue === 'Has Members' ) {
 						api.column( 14 ).search( 'Has Members', { exact: true } ).draw();
@@ -238,6 +262,19 @@ jQuery( document ).ready( function( $ ) {
 						api.column( 14 ).search( '' ).draw();
 						api.column( 15 ).search( '' ).draw();
 					}
+					
+					// Use setTimeout to prevent flashing
+					setTimeout( function() {
+						// Update the first option text to show the filter
+						if ( filterValue ) {
+							$this.find( 'option[value=""]' ).text( 'Members/Orders: ' + filterValue );
+							$this.addClass( 'filter-active' );
+							$this.val( '' );
+						} else {
+							$this.find( 'option[value=""]' ).text( 'Members/Orders' );
+							$this.removeClass( 'filter-active' );
+						}
+					}, 0 );
 				} );
 
 			// Add options for Members/Orders filter
@@ -250,9 +287,13 @@ jQuery( document ).ready( function( $ ) {
 			var savedMembersSearch = api.column( 14 ).search();
 			var savedOrdersSearch = api.column( 15 ).search();
 			if ( savedMembersSearch ) {
-				membersOrdersSelect.val( savedMembersSearch );
+				membersOrdersSelect.find( 'option[value=""]' ).text( 'Members/Orders: ' + savedMembersSearch );
+				membersOrdersSelect.addClass( 'filter-active' );
+				membersOrdersSelect.val( '' );
 			} else if ( savedOrdersSearch ) {
-				membersOrdersSelect.val( savedOrdersSearch );
+				membersOrdersSelect.find( 'option[value=""]' ).text( 'Members/Orders: ' + savedOrdersSearch );
+				membersOrdersSelect.addClass( 'filter-active' );
+				membersOrdersSelect.val( '' );
 			}
 
 			// Add reset filters button.
@@ -261,6 +302,31 @@ jQuery( document ).ready( function( $ ) {
 				.on( 'click', function() {
 					// Reset all filters and search
 					$( '#table-filters select' ).val( '' );
+					
+					// Reset dropdown labels to original text and remove active class
+					$( '#table-filters select' ).each( function() {
+						var $select = $( this );
+						var originalText = $select.find( 'option[value=""]' ).text();
+						
+						// Remove active filter class
+						$select.removeClass( 'filter-active' );
+						
+						// Extract original label from current text (remove any prefix)
+						if ( originalText.includes( ': ' ) ) {
+							var parts = originalText.split( ': ' );
+							var baseLabel = parts[0];
+							// Convert back to plural form for consistency
+							if ( baseLabel === 'Group' ) baseLabel = 'Groups';
+							else if ( baseLabel === 'Billing Cycle' ) baseLabel = 'Billing Cycles';
+							else if ( baseLabel === 'Recurring Limit' ) baseLabel = 'Recurring Limits';
+							else if ( baseLabel === 'Custom Trial' ) baseLabel = 'Custom Trials';
+							else if ( baseLabel === 'Expiration' ) baseLabel = 'Expirations';
+							else if ( baseLabel === 'Allow Signups' ) baseLabel = 'Allow Signups';
+							else if ( baseLabel === 'Members/Orders' ) baseLabel = 'Members/Orders';
+							
+							$select.find( 'option[value=""]' ).text( baseLabel );
+						}
+					} );
 					
 					api.search( '' ).columns().search( '' ).draw();
 					
