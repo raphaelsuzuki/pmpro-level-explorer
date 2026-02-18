@@ -57,9 +57,14 @@ jobs:
         run: |
           wp core download --version=${{ matrix.wordpress-versions }} --path=/tmp/wordpress --allow-root
           wp config create --dbname=wordpress_tests --dbuser=root --dbpass='' --dbhost=127.0.0.1 --path=/tmp/wordpress --allow-root
+          echo "WP_PHP_BINARY=php" >> $GITHUB_ENV
+          echo "WP_TESTS_DOMAIN=example.org" >> $GITHUB_ENV
+          echo "WP_TESTS_EMAIL=admin@example.org" >> $GITHUB_ENV
+          echo "WP_TESTS_TITLE=Test Blog" >> $GITHUB_ENV
           # Define WP_PHPUNIT__TABLE_PREFIX for the test library
           echo "WP_PHPUNIT__TABLE_PREFIX=wptests_" >> $GITHUB_ENV
           echo "WP_CORE_DIR=/tmp/wordpress" >> $GITHUB_ENV
+
 
       - name: Run PHPUnit tests
         run: composer test
