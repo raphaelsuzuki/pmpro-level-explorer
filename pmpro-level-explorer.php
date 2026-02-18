@@ -77,7 +77,7 @@ function pmpro_level_explorer_init() {
 	}
 
 	if ( is_admin() ) {
-		require_once PMPRO_LEVEL_EXPLORER_DIR . 'includes/class-admin-page.php';
+		require_once PMPRO_LEVEL_EXPLORER_DIR . 'includes/class-pmpro-level-explorer-admin.php';
 		PMPRO_Level_Explorer_Admin::init();
 	}
 }

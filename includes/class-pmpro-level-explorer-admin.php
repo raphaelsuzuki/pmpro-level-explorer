@@ -256,8 +256,9 @@ class PMPRO_Level_Explorer_Admin {
 				}
 				$group = implode( ', ', $formatted_groups );
 			}
-			
+
 			$cycle         = $l->cycle_number > 0 ? $l->cycle_number . ' ' . $l->cycle_period . '(s)' : '-';
+
 			$trial         = $l->trial_amount > 0 ? '$' . number_format( $l->trial_amount, 2 ) : '-';
 			$trial_enabled = $l->trial_amount > 0 || $l->trial_limit > 0 ? 'Enabled' : 'Disabled';
 
@@ -271,8 +272,9 @@ class PMPRO_Level_Explorer_Admin {
 			$member_count = isset( $member_counts[ $l->id ] ) ? $member_counts[ $l->id ] : 0;
 			$order_count = isset( $order_counts[ $l->id ] ) ? $order_counts[ $l->id ] : 0;
 			$active_subscription_count = isset( $active_subscription_counts[ $l->id ] ) ? $active_subscription_counts[ $l->id ] : 0;
-			
+
 			// Determine member/order status for filtering
+
 			$has_members = $member_count > 0 ? 'Has Members' : 'No Active Members';
 			$has_orders = $order_count > 0 ? 'Has Orders' : 'Never had Orders';
 
@@ -301,8 +303,10 @@ class PMPRO_Level_Explorer_Admin {
 				'signups_filter'        => $l->allow_signups ? 'Yes' : 'No',
 				'actions'               => '<a href="' . esc_url( admin_url( 'admin.php?page=pmpro-membershiplevels&edit=' . $l->id ) ) . '">' . esc_html__( 'Edit', 'pmpro-level-explorer' ) . '</a> | ' .
 					'<a href="' . esc_url( admin_url( 'admin.php?page=pmpro-membershiplevels&edit=-1&copy=' . $l->id ) ) . '">' . esc_html__( 'Copy', 'pmpro-level-explorer' ) . '</a> | ' .
+					/* translators: %s: membership level name */
 					'<a href="javascript:pmpro_askfirst(\'' . esc_js( sprintf( __( 'Are you sure you want to delete membership level %s? All payment subscriptions for this level will be cancelled.', 'pmpro-level-explorer' ), $l->name ) ) . '\', \'' . esc_js( $delete_url ) . '\'); void(0);" class="delete-link">' . esc_html__( 'Delete', 'pmpro-level-explorer' ) . '</a>',
 				'billing_amount'        => (float) $l->billing_amount,
+
 				'cycle_number'          => (int) $l->cycle_number,
 				'cycle_period'          => $l->cycle_period,
 				'initial_payment'       => (float) $l->initial_payment,
@@ -321,5 +325,5 @@ class PMPRO_Level_Explorer_Admin {
 
 		return $data;
 	}
-
 }
+
