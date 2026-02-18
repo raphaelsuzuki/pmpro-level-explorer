@@ -1,6 +1,20 @@
 # PMPro Level Explorer
 
+[![CI](https://github.com/raphaelsuzuki/pmpro-level-explorer/actions/workflows/ci.yml/badge.svg)](https://github.com/raphaelsuzuki/pmpro-level-explorer/actions/workflows/ci.yml)
+[![PHPCS](https://github.com/raphaelsuzuki/pmpro-level-explorer/actions/workflows/phpcs.yml/badge.svg)](https://github.com/raphaelsuzuki/pmpro-level-explorer/actions/workflows/phpcs.yml)
+[![PHPUnit](https://github.com/raphaelsuzuki/pmpro-level-explorer/actions/workflows/phpunit.yml/badge.svg)](https://github.com/raphaelsuzuki/pmpro-level-explorer/actions/workflows/phpunit.yml)
+
 Enhanced level management for Paid Memberships Pro with advanced filtering, sorting, and search powered by DataTables. PMPro Level Explorer adds a powerful admin interface to manage membership levels efficiently, perfect for sites with many levels.
+
+## Dependabot
+
+Dependabot is enabled for this repository to automatically manage dependency updates.
+
+- **What it does:** Automatically checks for outdated or vulnerable Composer dependencies and opens pull requests.
+- **Schedule:** Weekly (Monday mornings).
+- **How to review:** When a Dependabot PR is opened, review the included changelog and verify that the CI checks (PHPCS and PHPUnit) have passed.
+- **How to merge:** Once verified, you can merge the PR directly through the GitHub interface.
+
 
 ## Features
 
