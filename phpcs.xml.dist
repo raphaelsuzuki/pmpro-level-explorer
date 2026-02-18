@@ -26,7 +26,10 @@
     <!-- Rules for text domain -->
     <rule ref="WordPress.WP.I18n">
         <properties>
-            <property name="text_domain" type="array" value="pmpro-level-explorer"/>
+            <property name="text_domain" type="array">
+                <element value="pmpro-level-explorer"/>
+            </property>
         </properties>
     </rule>
+
 </ruleset>
