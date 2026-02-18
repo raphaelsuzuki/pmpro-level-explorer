@@ -5,14 +5,19 @@
  * @package Pmpro_Level_Explorer
  */
 
+// Load Composer autoloader.
+require_once dirname( __DIR__ ) . '/vendor/autoload.php';
+
+// Define the path to the WordPress tests library.
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 
 if ( ! $_tests_dir ) {
-	$_tests_dir = rtrim( sys_get_temp_dir(), '/\\' ) . '/wordpress-tests-lib';
+	// Use the library from wp-phpunit composer package.
+	$_tests_dir = dirname( __DIR__ ) . '/vendor/wp-phpunit/wp-phpunit';
 }
 
 if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
-	echo "Could not find $_tests_dir/includes/functions.php, have you run bin/install-wp-tests.sh ?" . PHP_EOL; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo "Could not find $_tests_dir/includes/functions.php. Ensure you have run 'composer install'." . PHP_EOL;
 	exit( 1 );
 }
 

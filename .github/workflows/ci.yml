@@ -84,9 +84,13 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
-      - name: Set up WordPress test environment
+      - name: Set up WordPress
         run: |
-          bash bin/install-wp-tests.sh wordpress_tests root '' localhost ${{ matrix.wordpress-versions }}
+          wp core download --version=${{ matrix.wordpress-versions }} --path=/tmp/wordpress --allow-root
+          wp config create --dbname=wordpress_tests --dbuser=root --dbpass='' --dbhost=127.0.0.1 --path=/tmp/wordpress --allow-root
+          echo "WP_CORE_DIR=/tmp/wordpress" >> $GITHUB_ENV
 
       - name: Run PHPUnit tests
         run: composer test
+        env:
+          WP_CORE_DIR: /tmp/wordpress
