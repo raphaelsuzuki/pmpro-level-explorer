@@ -16,13 +16,38 @@ if ( ! $_tests_dir ) {
 	$_tests_dir = dirname( __DIR__ ) . '/vendor/wp-phpunit/wp-phpunit';
 }
 
-if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
-	echo "Could not find $_tests_dir/includes/functions.php. Ensure you have run 'composer install'." . PHP_EOL;
-	exit( 1 );
+// Define missing constants for wp-phpunit.
+if ( ! defined( 'WP_TESTS_DOMAIN' ) ) {
+	define( 'WP_TESTS_DOMAIN', 'example.org' );
+}
+if ( ! defined( 'WP_TESTS_EMAIL' ) ) {
+	define( 'WP_TESTS_EMAIL', 'admin@example.org' );
+}
+if ( ! defined( 'WP_TESTS_TITLE' ) ) {
+	define( 'WP_TESTS_TITLE', 'Test Blog' );
+}
+if ( ! defined( 'WP_PHP_BINARY' ) ) {
+	define( 'WP_PHP_BINARY', 'php' );
+}
+
+// Ensure database constants are defined if they aren't already.
+// In CI, these are usually provided via environment variables.
+if ( ! defined( 'DB_NAME' ) ) {
+	define( 'DB_NAME', getenv( 'WP_DB_NAME' ) ?: 'wordpress_tests' );
+}
+if ( ! defined( 'DB_USER' ) ) {
+	define( 'DB_USER', getenv( 'WP_DB_USER' ) ?: 'root' );
+}
+if ( ! defined( 'DB_PASSWORD' ) ) {
+	define( 'DB_PASSWORD', getenv( 'WP_DB_PASS' ) ?: '' );
+}
+if ( ! defined( 'DB_HOST' ) ) {
+	define( 'DB_HOST', getenv( 'WP_DB_HOST' ) ?: '127.0.0.1' );
 }
 
 // Give access to tests_add_filter() function.
 require_once $_tests_dir . '/includes/functions.php';
+
 
 /**
  * Manually load the plugin being tested.
