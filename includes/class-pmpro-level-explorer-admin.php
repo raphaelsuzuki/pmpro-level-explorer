@@ -143,6 +143,32 @@ class PMPRO_Level_Explorer_Admin {
 	}
 
 	/**
+	 * Get grouped counts from a specific table with conditions.
+	 *
+	 * @since 1.4.4
+	 * @param string $table The table name.
+	 * @param string $where Custom WHERE clause.
+	 * @return array Associative array of membership_id => count.
+	 */
+	private static function get_grouped_counts( $table, $where = '' ) {
+		global $wpdb;
+		$counts    = array();
+		$where_sql = $where ? "WHERE {$where}" : '';
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$results = $wpdb->get_results(
+			"SELECT membership_id, COUNT(*) as count
+			FROM {$table}
+			{$where_sql}
+			GROUP BY membership_id"
+		);
+		foreach ( $results as $row ) {
+			$counts[ $row->membership_id ] = (int) $row->count;
+		}
+		return $counts;
+	}
+
+	/**
 	 * Get formatted levels data for DataTables.
 	 *
 	 * @since 1.0.0
@@ -155,43 +181,13 @@ class PMPRO_Level_Explorer_Admin {
 		$levels = $wpdb->get_results( "SELECT * FROM {$wpdb->pmpro_membership_levels} ORDER BY id DESC" );
 
 		// Get active member counts.
-		$member_counts = array();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$results = $wpdb->get_results(
-			"SELECT membership_id, COUNT(*) as count
-			FROM {$wpdb->pmpro_memberships_users}
-			WHERE status = 'active'
-			GROUP BY membership_id"
-		);
-		foreach ( $results as $row ) {
-			$member_counts[ $row->membership_id ] = (int) $row->count;
-		}
+		$member_counts = self::get_grouped_counts( $wpdb->pmpro_memberships_users, "status = 'active'" );
 
 		// Get order counts.
-		$order_counts = array();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$results = $wpdb->get_results(
-			"SELECT membership_id, COUNT(*) as count
-			FROM {$wpdb->pmpro_membership_orders}
-			WHERE membership_id IS NOT NULL
-			GROUP BY membership_id"
-		);
-		foreach ( $results as $row ) {
-			$order_counts[ $row->membership_id ] = (int) $row->count;
-		}
+		$order_counts = self::get_grouped_counts( $wpdb->pmpro_membership_orders, "membership_id IS NOT NULL" );
 
 		// Get active subscription counts (for filtering purposes).
-		$active_subscription_counts = array();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$results = $wpdb->get_results(
-			"SELECT membership_id, COUNT(*) as count
-			FROM {$wpdb->pmpro_memberships_users}
-			WHERE status = 'active' AND enddate IS NULL OR enddate > NOW()
-			GROUP BY membership_id"
-		);
-		foreach ( $results as $row ) {
-			$active_subscription_counts[ $row->membership_id ] = (int) $row->count;
-		}
+		$active_subscription_counts = self::get_grouped_counts( $wpdb->pmpro_memberships_users, "status = 'active' AND (enddate IS NULL OR enddate > NOW())" );
 
 		// Get group mappings.
 		$level_groups = array();
@@ -256,8 +252,9 @@ class PMPRO_Level_Explorer_Admin {
 				}
 				$group = implode( ', ', $formatted_groups );
 			}
-			
+
 			$cycle         = $l->cycle_number > 0 ? $l->cycle_number . ' ' . $l->cycle_period . '(s)' : '-';
+
 			$trial         = $l->trial_amount > 0 ? '$' . number_format( $l->trial_amount, 2 ) : '-';
 			$trial_enabled = $l->trial_amount > 0 || $l->trial_limit > 0 ? 'Enabled' : 'Disabled';
 
@@ -271,8 +268,9 @@ class PMPRO_Level_Explorer_Admin {
 			$member_count = isset( $member_counts[ $l->id ] ) ? $member_counts[ $l->id ] : 0;
 			$order_count = isset( $order_counts[ $l->id ] ) ? $order_counts[ $l->id ] : 0;
 			$active_subscription_count = isset( $active_subscription_counts[ $l->id ] ) ? $active_subscription_counts[ $l->id ] : 0;
-			
+
 			// Determine member/order status for filtering
+
 			$has_members = $member_count > 0 ? 'Has Members' : 'No Active Members';
 			$has_orders = $order_count > 0 ? 'Has Orders' : 'Never had Orders';
 
@@ -301,8 +299,10 @@ class PMPRO_Level_Explorer_Admin {
 				'signups_filter'        => $l->allow_signups ? 'Yes' : 'No',
 				'actions'               => '<a href="' . esc_url( admin_url( 'admin.php?page=pmpro-membershiplevels&edit=' . $l->id ) ) . '">' . esc_html__( 'Edit', 'pmpro-level-explorer' ) . '</a> | ' .
 					'<a href="' . esc_url( admin_url( 'admin.php?page=pmpro-membershiplevels&edit=-1&copy=' . $l->id ) ) . '">' . esc_html__( 'Copy', 'pmpro-level-explorer' ) . '</a> | ' .
+					/* translators: %s: membership level name */
 					'<a href="javascript:pmpro_askfirst(\'' . esc_js( sprintf( __( 'Are you sure you want to delete membership level %s? All payment subscriptions for this level will be cancelled.', 'pmpro-level-explorer' ), $l->name ) ) . '\', \'' . esc_js( $delete_url ) . '\'); void(0);" class="delete-link">' . esc_html__( 'Delete', 'pmpro-level-explorer' ) . '</a>',
 				'billing_amount'        => (float) $l->billing_amount,
+
 				'cycle_number'          => (int) $l->cycle_number,
 				'cycle_period'          => $l->cycle_period,
 				'initial_payment'       => (float) $l->initial_payment,
@@ -321,5 +321,5 @@ class PMPRO_Level_Explorer_Admin {
 
 		return $data;
 	}
-
 }
+
