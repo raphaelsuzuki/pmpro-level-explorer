@@ -143,6 +143,32 @@ class PMPRO_Level_Explorer_Admin {
 	}
 
 	/**
+	 * Get grouped counts from a specific table with conditions.
+	 *
+	 * @since 1.4.4
+	 * @param string $table The table name.
+	 * @param string $where Custom WHERE clause.
+	 * @return array Associative array of membership_id => count.
+	 */
+	private static function get_grouped_counts( $table, $where = '' ) {
+		global $wpdb;
+		$counts    = array();
+		$where_sql = $where ? "WHERE {$where}" : '';
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$results = $wpdb->get_results(
+			"SELECT membership_id, COUNT(*) as count
+			FROM {$table}
+			{$where_sql}
+			GROUP BY membership_id"
+		);
+		foreach ( $results as $row ) {
+			$counts[ $row->membership_id ] = (int) $row->count;
+		}
+		return $counts;
+	}
+
+	/**
 	 * Get formatted levels data for DataTables.
 	 *
 	 * @since 1.0.0
@@ -155,43 +181,13 @@ class PMPRO_Level_Explorer_Admin {
 		$levels = $wpdb->get_results( "SELECT * FROM {$wpdb->pmpro_membership_levels} ORDER BY id DESC" );
 
 		// Get active member counts.
-		$member_counts = array();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$results = $wpdb->get_results(
-			"SELECT membership_id, COUNT(*) as count
-			FROM {$wpdb->pmpro_memberships_users}
-			WHERE status = 'active'
-			GROUP BY membership_id"
-		);
-		foreach ( $results as $row ) {
-			$member_counts[ $row->membership_id ] = (int) $row->count;
-		}
+		$member_counts = self::get_grouped_counts( $wpdb->pmpro_memberships_users, "status = 'active'" );
 
 		// Get order counts.
-		$order_counts = array();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$results = $wpdb->get_results(
-			"SELECT membership_id, COUNT(*) as count
-			FROM {$wpdb->pmpro_membership_orders}
-			WHERE membership_id IS NOT NULL
-			GROUP BY membership_id"
-		);
-		foreach ( $results as $row ) {
-			$order_counts[ $row->membership_id ] = (int) $row->count;
-		}
+		$order_counts = self::get_grouped_counts( $wpdb->pmpro_membership_orders, "membership_id IS NOT NULL" );
 
 		// Get active subscription counts (for filtering purposes).
-		$active_subscription_counts = array();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$results = $wpdb->get_results(
-			"SELECT membership_id, COUNT(*) as count
-			FROM {$wpdb->pmpro_memberships_users}
-			WHERE status = 'active' AND enddate IS NULL OR enddate > NOW()
-			GROUP BY membership_id"
-		);
-		foreach ( $results as $row ) {
-			$active_subscription_counts[ $row->membership_id ] = (int) $row->count;
-		}
+		$active_subscription_counts = self::get_grouped_counts( $wpdb->pmpro_memberships_users, "status = 'active' AND (enddate IS NULL OR enddate > NOW())" );
 
 		// Get group mappings.
 		$level_groups = array();
