@@ -16,40 +16,12 @@ if (!$_tests_dir) {
 	$_tests_dir = dirname(__DIR__) . '/vendor/wp-phpunit/wp-phpunit';
 }
 
-// Define missing constants for wp-phpunit from environment variables or defaults.
-// These must be defined before wp-phpunit's functions.php is included.
-if (!defined('WP_TESTS_DOMAIN')) {
-	define('WP_TESTS_DOMAIN', getenv('WP_TESTS_DOMAIN') ?: 'example.org');
-}
-if (!defined('WP_TESTS_EMAIL')) {
-	define('WP_TESTS_EMAIL', getenv('WP_TESTS_EMAIL') ?: 'admin@example.org');
-}
-if (!defined('WP_TESTS_TITLE')) {
-	define('WP_TESTS_TITLE', getenv('WP_TESTS_TITLE') ?: 'Test Blog');
-}
-if (!defined('WP_PHP_BINARY')) {
-	define('WP_PHP_BINARY', getenv('WP_PHP_BINARY') ?: 'php');
-}
+// Tell wp-phpunit where to find the test config. This needs to be available to
+// child processes (via getenv) when wp-phpunit runs install.php via system().
+putenv('WP_PHPUNIT__TESTS_CONFIG=' . __DIR__ . '/wp-tests-config.php');
 
-// Define WordPress directory.
-if (!defined('WP_CORE_DIR')) {
-	define('WP_CORE_DIR', getenv('WP_CORE_DIR') ?: '/tmp/wordpress');
-}
-
-// Ensure database constants are defined if they aren't already.
-// In CI, these are usually provided via environment variables.
-if (!defined('DB_NAME')) {
-	define('DB_NAME', getenv('WP_DB_NAME') ?: 'wordpress_tests');
-}
-if (!defined('DB_USER')) {
-	define('DB_USER', getenv('WP_DB_USER') ?: 'root');
-}
-if (!defined('DB_PASSWORD')) {
-	define('DB_PASSWORD', getenv('WP_DB_PASS') ?: '');
-}
-if (!defined('DB_HOST')) {
-	define('DB_HOST', getenv('WP_DB_HOST') ?: '127.0.0.1');
-}
+// Define the constants in the current process.
+require_once __DIR__ . '/wp-tests-config.php';
 
 // Give access to tests_add_filter() function.
 require_once $_tests_dir . '/includes/functions.php';
