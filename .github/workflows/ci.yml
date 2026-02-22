@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+jobs:
+  phpcs:
+    name: PHPCS Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run PHPCS
+        run: composer phpcs
+
+  phpunit:
+    name: PHP ${{ matrix.php-versions }} / WP ${{ matrix.wordpress-versions }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-versions: [ '8.0', '8.1' ]
+        wordpress-versions: [ 'latest' ]
+
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_PASSWORD:
+          MYSQL_DATABASE: wordpress_tests
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: mysqli, zip, gd
+          coverage: xdebug
+          tools: composer:v2, wp-cli
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Set up WordPress
+        run: |
+          wp core download --version=${{ matrix.wordpress-versions }} --path=/tmp/wordpress --allow-root
+          wp config create --dbname=wordpress_tests --dbuser=root --dbpass='' --dbhost=127.0.0.1 --path=/tmp/wordpress --allow-root
+          echo "WP_PHP_BINARY=php" >> $GITHUB_ENV
+          echo "WP_TESTS_DOMAIN=example.org" >> $GITHUB_ENV
+          echo "WP_TESTS_EMAIL=admin@example.org" >> $GITHUB_ENV
+          echo "WP_TESTS_TITLE=Test Blog" >> $GITHUB_ENV
+          echo "WP_PHPUNIT__TABLE_PREFIX=wptests_" >> $GITHUB_ENV
+          echo "WP_CORE_DIR=/tmp/wordpress" >> $GITHUB_ENV
+
+      - name: Run PHPUnit tests
+        run: composer test
+        env:
+          WP_CORE_DIR: /tmp/wordpress

@@ -13,3 +13,14 @@ Thumbs.db
 *.log
 *.tmp
 *~
+
+# Dependencies
+vendor/
+node_modules/
+
+# Test Configs
+.phpcs.xml
+phpunit.xml
+coverage.xml
+.phpunit.result.cache
+
